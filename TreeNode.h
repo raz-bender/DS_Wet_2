@@ -6,13 +6,15 @@ template<class Key, class Data>
 class TreeNode
 {
 public:
-	explicit TreeNode(const Key& , const Data&);
+	explicit TreeNode(const Key& , const Data&, bool isRankTree);
 	~TreeNode() = default;
 	int getBF() const;
 	TreeNode* roll();
 	const Data& getData()const;
 	const Key& getKey()const;
+	const int getValue()const;
 	void setData(const Data&);
+	void setValue(const int);
 	void setKey(const Key&);
 	int getHeight()const;
 	void setHeight(int);
@@ -28,6 +30,8 @@ private:
 	Key m_key;
 	Data m_data;
 	int m_height;
+	int m_value;
+	bool m_isRankTree;
 
 
 	TreeNode* rollLL(TreeNode* node);
@@ -39,7 +43,7 @@ private:
 };
 
 template<class Key, class Data>
-TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data)
+TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data, bool isRankTree)
 {
 	m_key = key;
 	m_data = data;
@@ -47,6 +51,8 @@ TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data)
 	m_left = nullptr;
 	m_parent = nullptr;
 	m_height = 0;
+	m_value = 0;
+	m_isRankTree = isRankTree;
 }
 
 template<class Key, class Data>
@@ -75,6 +81,18 @@ template<class Key, class Data>
 void TreeNode<Key, Data>::setData(const Data& data)
 {
 	m_data = data;
+}
+
+template<class Key, class Data>
+const int TreeNode<Key, Data>::getValue()const
+{
+	return this->m_value;
+}
+
+template<class Key, class Data>
+void TreeNode<Key, Data>::setValue(const int value)
+{
+	m_value = value;
 }
 
 template<class Key, class Data>
@@ -114,6 +132,13 @@ template<class Key, class Data>
 TreeNode<Key, Data>* TreeNode<Key, Data>::rollLL(TreeNode* node)
 {
 	TreeNode* temp = node->m_left;
+
+	//update value
+	int newNodeValue = (temp->m_right ? temp->m_right->getValue() : 0) + (node->m_right ? node->m_right->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
+	int newTempValue = newNodeValue +  (temp->m_left ? temp->m_left->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
+	node->setValue(newNodeValue);
+	temp->setValue(newTempValue);
+
 	node->m_left = temp->m_right;
 	if (temp->m_right)
 		temp->m_right->m_parent = node;
@@ -157,6 +182,13 @@ template<class Key, class Data>
 TreeNode<Key, Data>* TreeNode<Key, Data>::rollRR(TreeNode* node)
 {
 	TreeNode* newRoot = node->m_right;
+
+	//update value
+	int newNodeValue = (newRoot->m_left ? newRoot->m_left->getValue() : 0) + (node->m_left ? node->m_left->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
+	int newTempValue = newNodeValue + (newRoot->m_right ? newRoot->m_right->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
+	node->setValue(newNodeValue);
+	newRoot->setValue(newTempValue);
+
 	node->m_right = newRoot->m_left;
 	if (newRoot->m_left)
 		newRoot->m_left->m_parent = node;
@@ -195,5 +227,11 @@ void TreeNode<Key, Data>::updateHeight()
 		this->m_height =  this->m_left ? this->m_left->m_height + 1 : this->m_right->m_height + 1;
 	else
 		this->m_height = std::max(this->m_right->m_height, this->m_left->m_height) + 1;
+
+	if (m_isRankTree)
+	{
+		int curNodeRank = (m_right ? m_right->getValue() : 0) + (m_left ? m_left->getValue() : 0) + 1;
+		this->setValue(curNodeRank);
+	}
 }
 #endif
