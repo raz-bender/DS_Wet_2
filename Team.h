@@ -8,6 +8,7 @@
 #include "list.h"
 #include "wet2util.h"
 #include "Player.h"
+typedef AvlTree<int ,Player*>::Key_Data_pair** Pair_Ptr_arr;
 
 class Team {
     int m_id;
@@ -16,8 +17,14 @@ class Team {
     Player* m_median_player;
 
     //strength player
-    AvlTree<int ,Player*> m_players;
-    List<Player*> m_newest_player;
+    AvlTree<int ,Player*>* m_players;
+    List<Player*>* m_newest_player;
+    void set_median();
+
+    Pair_Ptr_arr merge_arrays_key_data_pair(Pair_Ptr_arr arr1 , int size1 ,Pair_Ptr_arr arr2 , int size2);
+    AvlTree<int, Player*>* create_tree_from_array(Pair_Ptr_arr arr,int size);
+    void aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Player *>* parent , int& redundant, int height);
+    void aux_insert_data_to_tree(TreeNode<int , Player*>* root ,Pair_Ptr_arr arr , int &i ,int height , int teamId = -1);
 
 public:
     Team(int teamId);
@@ -30,9 +37,17 @@ public:
     int get_id()const;
 
     StatusType add_player(int playerStrength);
-    StatusType remove_newest_player(int playerStrength);
+    StatusType remove_newest_player();
 
     int getStrength() const;
+
+    AvlTree<int, Player *>::Key_Data_pair** get_team_player_array();
+
+    void merge_team_into_me(Team& team2);
+
+    void print(){
+        this->m_players->printBinaryTree();
+    }
 };
 
 

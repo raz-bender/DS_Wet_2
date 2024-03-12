@@ -18,6 +18,7 @@ HashTable<Key,Data>::~HashTable() {
     //deletes the tree nodes not the data
     for (int i = 0; i < m_table_size; ++i) {
           if(m_tree_table[i] != nullptr){
+              m_tree_table[i]->deleteTreeData(m_tree_table[i]->getRoot());//deletes the newcpp
               delete m_tree_table[i];
           }
     }

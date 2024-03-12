@@ -14,9 +14,10 @@ template<class T>
 class List{
 private:
     Node<T>* m_head;
+    Node<T>* m_tail;
 
 public:
-    List():m_head(nullptr){}
+    List():m_head(nullptr) , m_tail(nullptr){}
 
     ~List() {
         Node<T> *current = m_head;
@@ -49,6 +50,29 @@ public:
         newNode->data = value;
         newNode->next = m_head;
         m_head = newNode;
+        if(m_tail == nullptr){
+            m_tail = newNode;
+        }
+    }
+
+    T& pop(){
+        T& rtn = m_head->data;
+        Node<T>* newHead = m_head->next;
+        delete m_head;
+        m_head = newHead;
+        if (newHead == nullptr){
+            m_tail = nullptr;
+        }
+        return rtn;
+    }
+    T& get_head(){
+        return m_head->data;
+    }
+    /// connects list2 such that list 2 is at the head
+    /// \param list2
+    void connect_list(List<T>& list2){
+        list2.m_tail->next = this->m_head;
+        this->m_head = list2.m_head;
     }
 
 };

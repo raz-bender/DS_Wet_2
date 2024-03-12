@@ -40,11 +40,12 @@ public:
 	Node* getPrevNode(Node* node, Node* prevNode = nullptr, bool goLeft = true);
 
     struct Key_Data_pair{
-        const Key key;
-        const Data data;
-        Key_Data_pair(const Key& key_val,const Data data_val):key(key_val),data(data_val){}
+        const Key& key;
+        const Data& data;
+        Key_Data_pair(const Key& key_val,const Data& data_val):key(key_val),data(data_val){}
     };
     Key_Data_pair** get_tree_as_array();
+
 
 	int getNodeRank(Node* node);
 	Node* getNodeByIndex(int index);
@@ -64,6 +65,7 @@ private:
     void aux_inorder_tree_to_array(TreeNode<Key,Data>* node,Key_Data_pair** array , int &i);
 
 };
+
 /// returns an array with key data pairs in order (according to inorder iteration)
 /// \tparam Key
 /// \tparam Data
