@@ -12,7 +12,7 @@ class AvlTree
 	typedef TreeNode<Key, Data> Node;
 
 public:
-	AvlTree(bool isRankTree);
+	AvlTree();
 	~AvlTree();
 
 	Node* find(const Key& key, const Data& data = NULL);
@@ -45,7 +45,6 @@ public:
 private:
 	Node* m_root;
 	int m_size;
-	bool m_isRankTree;
 
 	void deleteTree(Node* node);
 	Node* findAux(Node* root, const Key& key, const Data& data = NULL) ;
@@ -96,10 +95,9 @@ void AvlTree<Key, Data>::setValueToNodesAux(Node* node, Node* curNode, int value
 }
 
 template <class Key, class Data>
-AvlTree<Key, Data>::AvlTree(bool isRankTree){
+AvlTree<Key, Data>::AvlTree(){
 	m_size = 0;
 	m_root = nullptr;
-	m_isRankTree = isRankTree;
 }
 
 template <class Key, class Data>
@@ -179,10 +177,10 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findAux(Node* root, const
 template <class Key, class Data>
 bool AvlTree<Key, Data>::insert(const Key& key, const Data& data, bool enableDuplications)//put this function under try catch
 {
-	if (enableDuplications ? find(key, data) : find(key))
+	if (!enableDuplications && find(key, data))
 		return false;
 
-	Node* newNode = new Node(key, data, m_isRankTree);
+	Node* newNode = new Node(key, data);
 	m_root = insertAux(key, data, m_root, nullptr, newNode, enableDuplications);
 	m_size++;
 	return true;;
@@ -195,30 +193,30 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::insertAux(const Key& key,
 	{
 		curNode = newNode;
 		curNode->m_parent = parent;
-		curNode->setValue(m_isRankTree ? 1 :-reduceValue);
+		curNode->setSubTreeSize(1);
+		curNode->setValue(-reduceValue);
 	}
 	else
 	{
-		if (!m_isRankTree)
-			reduceValue += curNode->getValue();
+		reduceValue += curNode->getValue();
 
-		if (enableDuplications && curNode->getKey() == key)
+		if (curNode->getKey() == key)
 		{
-			if(curNode->getData() > data)
+			if (curNode->getData() > data)
 				curNode->m_left = insertAux(key, data, curNode->m_left, curNode, newNode, enableDuplications, reduceValue);
 			else
 				curNode->m_right = insertAux(key, data, curNode->m_right, curNode, newNode, enableDuplications, reduceValue);
+
 		}
 		else if (curNode->getKey() > key)
 			curNode->m_left = insertAux(key, data, curNode->m_left, curNode, newNode, enableDuplications, reduceValue);
 		else
 			curNode->m_right = insertAux(key, data, curNode->m_right, curNode, newNode, enableDuplications, reduceValue);
 
-		if (m_isRankTree)
-		{
-			int curNodeRank = (curNode->m_right ? curNode->m_right->getValue() : 0) + (curNode->m_left ? curNode->m_left->getValue() : 0) + 1;
-			curNode->setValue(curNodeRank);
-		}
+
+		int curNodeRank = (curNode->m_right ? curNode->m_right->getSubTreeSize() : 0) + (curNode->m_left ? curNode->m_left->getSubTreeSize() : 0) + 1;
+		curNode->setSubTreeSize(curNodeRank);
+		
 
 		if (abs(curNode->getBF()) > 1)
 		{
@@ -412,19 +410,38 @@ int AvlTree<Key, Data>::getNodeRank(Node* node)
 		//go right
 		else
 		{
-			counter += temp->m_left ? (temp->m_left->getValue() + 1) : 1;
+			counter += temp->m_left ? (temp->m_left->getSubTreeSize() + 1) : 1;
 			temp = temp->m_right;
 		}
 	} 
 	
-	counter += node->m_left ? (node->m_left->getValue() + 1) : 1;
+	counter += node->m_left ? (node->m_left->getSubTreeSize() + 1) : 1;
 	return counter;
 }
 
 template<class Key, class Data>
 int AvlTree<Key, Data>::getNodeCalculatedValue(Node* node)
 {
+	Node* temp = m_root;
+	int counter = 0;
+	while (temp != node)
+	{
+		counter += temp->getValue();
 
+		//go left 
+		if (temp->getKey() > node->getKey() || (temp->getKey() == node->getKey() && temp->getData() > node->getData()))
+		{
+			temp = temp->m_left;
+		}
+		//go right
+		else
+		{
+			temp = temp->m_right;
+		}
+	}
+
+	counter += temp->getValue();
+	return counter;
 }
 
 template <class Key, class Data>

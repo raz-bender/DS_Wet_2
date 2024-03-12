@@ -6,15 +6,17 @@ template<class Key, class Data>
 class TreeNode
 {
 public:
-	explicit TreeNode(const Key& , const Data&, bool isRankTree);
+	explicit TreeNode(const Key& , const Data&);
 	~TreeNode() = default;
 	int getBF() const;
 	TreeNode* roll();
 	const Data& getData()const;
 	const Key& getKey()const;
 	const int getValue()const;
+	const int getSubTreeSize()const;
 	void setData(const Data&);
 	void setValue(const int);
+	void setSubTreeSize(const int);
 	void setKey(const Key&);
 	int getHeight()const;
 	void setHeight(int);
@@ -31,8 +33,7 @@ private:
 	Data m_data;
 	int m_height;
 	int m_value;
-	bool m_isRankTree;
-
+	int m_subTreeSize;
 
 	TreeNode* rollLL(TreeNode* node);
 	TreeNode* rollLR(TreeNode* node);
@@ -43,7 +44,7 @@ private:
 };
 
 template<class Key, class Data>
-TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data, bool isRankTree)
+TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data)
 {
 	m_key = key;
 	m_data = data;
@@ -52,7 +53,6 @@ TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data, bool isRankTree)
 	m_parent = nullptr;
 	m_height = 0;
 	m_value = 0;
-	m_isRankTree = isRankTree;
 }
 
 template<class Key, class Data>
@@ -90,9 +90,21 @@ const int TreeNode<Key, Data>::getValue()const
 }
 
 template<class Key, class Data>
+const int TreeNode<Key, Data>::getSubTreeSize() const
+{
+	return m_subTreeSize;
+}
+
+template<class Key, class Data>
 void TreeNode<Key, Data>::setValue(const int value)
 {
 	m_value = value;
+}
+
+template<class Key, class Data>
+inline void TreeNode<Key, Data>::setSubTreeSize(const int size)
+{
+	m_subTreeSize = size;
 }
 
 template<class Key, class Data>
@@ -131,28 +143,38 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::roll()
 template<class Key, class Data>
 TreeNode<Key, Data>* TreeNode<Key, Data>::rollLL(TreeNode* node)
 {
-	TreeNode* temp = node->m_left;
+	TreeNode* newRoot = node->m_left;
+
+	//update sub tree size
+	int newRootSubSize = (newRoot->m_right ? newRoot->m_right->getSubTreeSize() : 0) + (node->m_right ? node->m_right->getSubTreeSize() : 0) +  1;
+	int oldRootSubSize = newRootSubSize +  (newRoot->m_left ? newRoot->m_left->getSubTreeSize() : 0) + 1;
+	node->setSubTreeSize(newRootSubSize);
+	newRoot->setSubTreeSize(oldRootSubSize);
 
 	//update value
-	int newNodeValue = (temp->m_right ? temp->m_right->getValue() : 0) + (node->m_right ? node->m_right->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
-	int newTempValue = newNodeValue +  (temp->m_left ? temp->m_left->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
-	node->setValue(newNodeValue);
-	temp->setValue(newTempValue);
+	int newRootValue = newRoot->getValue() + node->getValue();
+	int oldRootValue = node->getValue() - newRootValue;
+	
+	if (newRoot->m_right)
+		newRoot->m_right->setValue(newRoot->m_right->getValue() + newRoot->getValue());
 
-	node->m_left = temp->m_right;
-	if (temp->m_right)
-		temp->m_right->m_parent = node;
-	temp->m_right = node;
-	temp->m_parent = node->m_parent;
-	node->m_parent = temp;
+	node->setValue(oldRootValue);
+	newRoot->setValue(newRootValue);
 
-	if (temp->m_parent != nullptr)
+	node->m_left = newRoot->m_right;
+	if (newRoot->m_right)
+		newRoot->m_right->m_parent = node;
+	newRoot->m_right = node;
+	newRoot->m_parent = node->m_parent;
+	node->m_parent = newRoot;
+
+	if (newRoot->m_parent != nullptr)
 	{
-		temp->m_parent->m_right = temp->m_parent->m_right == node ? temp : temp->m_parent->m_right;
-		temp->m_parent->m_left = temp->m_parent->m_left == node ? temp : temp->m_parent->m_left;
+		newRoot->m_parent->m_right = newRoot->m_parent->m_right == node ? newRoot : newRoot->m_parent->m_right;
+		newRoot->m_parent->m_left = newRoot->m_parent->m_left == node ? newRoot : newRoot->m_parent->m_left;
 	}
 
-	node = temp;
+	node = newRoot;
 
 	if(node->m_left)
 		node->m_left->updateHeight();
@@ -183,11 +205,22 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollRR(TreeNode* node)
 {
 	TreeNode* newRoot = node->m_right;
 
+	//update sub tree size
+	int newRootSubSize = (newRoot->m_left ? newRoot->m_left->getSubTreeSize() : 0) + (node->m_left ? node->m_left->getSubTreeSize() : 0) +  1;
+	int oldRootSubSize = newRootSubSize + (newRoot->m_right ? newRoot->m_right->getSubTreeSize() : 0) +  1;
+	node->setSubTreeSize(newRootSubSize);
+	newRoot->setSubTreeSize(oldRootSubSize);
+
 	//update value
-	int newNodeValue = (newRoot->m_left ? newRoot->m_left->getValue() : 0) + (node->m_left ? node->m_left->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
-	int newTempValue = newNodeValue + (newRoot->m_right ? newRoot->m_right->getValue() : 0) + (node->m_isRankTree ? 1 : 0);
-	node->setValue(newNodeValue);
-	newRoot->setValue(newTempValue);
+	int newRootValue = newRoot->getValue() + node->getValue();
+	int oldRootValue = node->getValue() - newRootValue;
+
+
+	if (newRoot->m_left)
+		newRoot->m_left->setValue(newRoot->m_left->getValue() + newRoot->getValue());
+
+	node->setValue(oldRootValue);
+	newRoot->setValue(newRootValue);
 
 	node->m_right = newRoot->m_left;
 	if (newRoot->m_left)
@@ -228,10 +261,8 @@ void TreeNode<Key, Data>::updateHeight()
 	else
 		this->m_height = std::max(this->m_right->m_height, this->m_left->m_height) + 1;
 
-	if (m_isRankTree)
-	{
-		int curNodeRank = (m_right ? m_right->getValue() : 0) + (m_left ? m_left->getValue() : 0) + 1;
-		this->setValue(curNodeRank);
-	}
+
+	int curNodeRank = (m_right ? m_right->getSubTreeSize() : 0) + (m_left ? m_left->getSubTreeSize() : 0) + 1;
+	this->setSubTreeSize(curNodeRank);
 }
 #endif
