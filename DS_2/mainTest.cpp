@@ -32,7 +32,10 @@ void TestRankTree()
 	tree.remove(4,5);
 	tree.remove(5,5);
 	tree.remove(5,6);
+	tree.printBinaryTree(5);
 	assert(tree.getNodeRank(tree.find(9, 9)) == 13);
+	assert(tree.getNodeByIndex(13) == tree.find(9, 9));
+	assert(tree.getNodeByIndex(4) == tree.find(2, 3));
 
 	AvlTree<int, int> tree2 = AvlTree<int, int>();
 	for (int i = 1; i <= 1000; i++)

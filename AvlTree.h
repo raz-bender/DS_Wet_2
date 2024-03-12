@@ -40,6 +40,7 @@ public:
 	Node* getPrevNode(Node* node, Node* prevNode = nullptr, bool goLeft = true);
 
 	int getNodeRank(Node* node);
+	Node* getNodeByIndex(int index);
 	int getNodeCalculatedValue(Node* node);
 
 private:
@@ -417,6 +418,33 @@ int AvlTree<Key, Data>::getNodeRank(Node* node)
 	
 	counter += node->m_left ? (node->m_left->getSubTreeSize() + 1) : 1;
 	return counter;
+}
+
+template<class Key, class Data>
+typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
+{
+	if (index <= 0 || index > m_size)
+		throw new exception("Should noot get here");
+
+	Node* temp = m_root;
+	int curIndex = 0;
+	while (temp != nullptr)
+	{
+		curIndex += (temp->m_left ? temp->m_left->getSubTreeSize() : 0) + 1;
+		if (curIndex == index)
+			break;
+		else if (curIndex < index)
+		{
+
+			temp = temp->m_right;
+		}
+		else
+		{
+			curIndex -= (temp->m_left ? temp->m_left->getSubTreeSize() : 0) + 1;
+			temp = temp->m_left;
+		}
+	}
+	return temp;
 }
 
 template<class Key, class Data>
