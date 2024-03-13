@@ -29,6 +29,10 @@ public:
     void setPlayerStrength(const int strength) {
         m_player_strength = strength;
     }
+
+    void print(){
+        cout << "\n player : " << this->m_teamId << " strength : " << this->m_player_strength << "\n";
+    }
 };
 
 

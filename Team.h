@@ -15,10 +15,10 @@ class Team {
     int m_size;
     int m_num_of_wins;
     Player* m_median_player;
-
+    List<Player*>* m_newest_player;
     //strength player
     AvlTree<int ,Player*>* m_players;
-    List<Player*>* m_newest_player;
+
     void set_median();
 
     Pair_Ptr_arr merge_arrays_key_data_pair(Pair_Ptr_arr arr1 , int size1 ,Pair_Ptr_arr arr2 , int size2);
@@ -27,6 +27,8 @@ class Team {
     void aux_insert_data_to_tree(TreeNode<int , Player*>* root ,Pair_Ptr_arr arr , int &i ,int height , int teamId = -1);
 
 public:
+
+
     Team(int teamId);
     ~Team();
 
@@ -43,7 +45,7 @@ public:
 
     AvlTree<int, Player *>::Key_Data_pair** get_team_player_array();
 
-    void merge_team_into_me(Team& team2);
+    void merge_team_into_me(Team* team2);
 
     void print(){
         this->m_players->printBinaryTree();

@@ -68,11 +68,21 @@ public:
     T& get_head(){
         return m_head->data;
     }
+    void set_head(Node<T>* node){
+        m_head = node;
+    }
     /// connects list2 such that list 2 is at the head
     /// \param list2
     void connect_list(List<T>& list2){
         list2.m_tail->next = this->m_head;
         this->m_head = list2.m_head;
+    }
+    void print(){
+        auto temp = m_head;
+        while (temp != nullptr){
+            temp->data->print();
+            temp = temp->next;
+        }
     }
 
 };
