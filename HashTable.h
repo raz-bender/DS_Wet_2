@@ -37,6 +37,7 @@ public:
     StatusType remove(Key& key,Data& val);
 
     size_t get_table_size()const;
+
     size_t get_size()const;
 };
 

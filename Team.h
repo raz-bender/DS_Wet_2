@@ -47,6 +47,10 @@ public:
 
     void merge_team_into_me(Team* team2);
 
+    //for testing
+    int get_median_strength(){
+        return this->m_median_player->getPlayerStrength();
+    }
     void print(){
         this->m_players->printBinaryTree();
     }

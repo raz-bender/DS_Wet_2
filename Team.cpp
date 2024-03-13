@@ -77,7 +77,8 @@ int& Team::get_id_ref(){
 }
 
 void Team::set_median() {
-
+    int median_index = floor(this->get_size()/2);
+    m_median_player = m_players->getNodeByIndex(median_index + 1)->getData();
 }
 
 AvlTree<int, Player *>::Key_Data_pair** Team::get_team_player_array() {
@@ -170,12 +171,14 @@ void Team::aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Pl
     root->setHeight(0);
     if (height == 0){
         root->setHeight(height);
+        root->setSubTreeSize(1);
         root->m_left = nullptr;
         root->m_right = nullptr;
         return;
     }else if (height == 1 && redundant > 0){
         if (redundant == 1) {
             root->setHeight(height);
+            root->setSubTreeSize(2);
             redundant--;
             root->m_right = nullptr;
             root->m_left = new TreeNode<int, Player *>(0, nullptr);
@@ -183,6 +186,7 @@ void Team::aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Pl
             return;
         }else{
             root->setHeight(0);
+            root->setSubTreeSize(1);
             redundant -= 2;
             root->m_left = nullptr;
             root->m_right = nullptr;
@@ -194,6 +198,7 @@ void Team::aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Pl
 
     root->m_left = new TreeNode<int, Player*>(0 , nullptr);
     aux_create_empty_tree(root->m_left , root , redundant ,height - 1);
+    root->setSubTreeSize(root->m_left->getSubTreeSize() + root->m_right->getSubTreeSize() + 1 );
     root->updateHeight();
 }
 

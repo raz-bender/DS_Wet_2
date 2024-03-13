@@ -458,7 +458,7 @@ template<class Key, class Data>
 typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
 {
 	if (index <= 0 || index > m_size)
-		throw new exception("Should noot get here");
+		throw ("Should not get here");
 
 	Node* temp = m_root;
 	int curIndex = 0;
