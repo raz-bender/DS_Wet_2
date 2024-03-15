@@ -6,17 +6,16 @@
 #include "math.h"
 
 
-Team::Team(const int teamId): m_id(teamId) , m_size(0),m_num_of_wins(0)
-, m_players(new AvlTree<int ,Player*>()) , m_newest_player(new List<Player*>()){}
+Team::Team(const int teamId): m_id(teamId) , m_size(0),m_num_of_wins(0) , m_median_player(nullptr)
+, m_newest_player(new List<Player*>()) , m_players(new AvlTree<int ,Player*>()) {}
 
 Team::~Team() {
     if (this->m_newest_player != nullptr) {
-       m_newest_player->Delete_list_and_Data();
-    }//deletes the players in the list
+       m_newest_player->Delete_list_and_Data();//deletes the players in the list
+    }
     //m_players->deleteTreeData(m_players->getRoot());
     delete m_players;
     delete m_newest_player;
-   // m_players.deleteTreeData(m_players.getRoot()); // deletes the players in the tree
 }
 
 int Team::get_size() const {
@@ -92,7 +91,7 @@ AvlTree<int, Player *>::Key_Data_pair** Team::get_team_player_array() {
 /// \param arr2 NOT DELETED
 /// \param size2
 Pair_Ptr_arr Team::merge_arrays_key_data_pair(Pair_Ptr_arr arr1, int size1, Pair_Ptr_arr arr2, int size2){
-    size_t newsize= size1 + size2;
+    int newsize= size1 + size2;
     Pair_Ptr_arr newArr = new AvlTree<int , Player*>::Key_Data_pair*[newsize];
     int k = 0 , l = 0;
     for (int i = 0; i < newsize ; ++i) {

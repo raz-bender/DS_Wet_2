@@ -4,10 +4,14 @@
 #ifndef HASH_TABLE_CPP
 #define HASH_TABLE_CPP
 #include "HashTable.h"
+static int INIT_SIZE = 32;
+static double INCREASE_FACTOR = 8;
+static double DECREASE_FACTOR = 0.25;//1/4
+static int MIN_SIZE = 8;
 
 template<class Key , class Data>
 HashTable<Key,Data>::HashTable(HashFunction functionPtr) : m_size(0) , m_table_size(INIT_SIZE)
-,m_tree_table(new AvlTree<Key,Data>*[m_table_size]) ,m_hash_func(functionPtr) {
+,m_hash_func(functionPtr),m_tree_table(new AvlTree<Key,Data*>*[m_table_size])  {
     for (int i = 0; i < m_table_size; ++i) {
         m_tree_table[i] = nullptr;
     }
@@ -17,7 +21,7 @@ template<class Key , class Data>
 HashTable<Key,Data>::~HashTable() {
     for (int i = 0; i < m_table_size; ++i) {
           if(m_tree_table[i] != nullptr){
-              m_tree_table[i]->deleteTreeData(m_tree_table[i]->getRoot());//deletes the tree data
+              m_tree_table[i]->deleteTreeData(m_tree_table[i]->getRoot());//deletes the tree data i.e teams
               delete m_tree_table[i];
           }
     }
@@ -25,7 +29,7 @@ HashTable<Key,Data>::~HashTable() {
 }
 
 template<class Key , class Data>
-StatusType HashTable<Key, Data>::insert(Key& key,Data& val) {//change to bool
+StatusType HashTable<Key, Data>::insert(Key& key,Data* val) {//change to bool
 
     if (this->search(key) != nullptr){
         return StatusType::FAILURE;//already exist in the data structure
@@ -36,7 +40,7 @@ StatusType HashTable<Key, Data>::insert(Key& key,Data& val) {//change to bool
     int hash_index = m_hash_func(key,m_table_size);
 
     if(m_tree_table[hash_index] == nullptr){//no tree in slot yet
-        m_tree_table[hash_index] = new AvlTree<Key,Data>();
+        m_tree_table[hash_index] = new AvlTree<Key,Data*>();
     }
 
     m_tree_table[hash_index]->insert(key,val);//see what is the change in AVL
@@ -51,11 +55,11 @@ template<class Key , class Data>
     if (m_tree_table[hash_index] == nullptr){
         return nullptr;
     }
-    return m_tree_table[hash_index]->find(key) == nullptr ? nullptr : &m_tree_table[hash_index]->find(key)->getData();
+    return m_tree_table[hash_index]->find(key) == nullptr ? nullptr : m_tree_table[hash_index]->find(key)->getData();
 }
 
 template<class Key , class Data>
-StatusType HashTable<Key, Data>::remove(Key& key,Data& val) {
+StatusType HashTable<Key, Data>::remove(Key& key,Data* val) {
 
     if (this->search(key) == nullptr){
         return StatusType::FAILURE;//doesn't exist in the data structure
@@ -81,15 +85,15 @@ void HashTable<Key, Data>::Decrease_size() {
 
 template<class Key, class Data>
 void HashTable<Key, Data>::change_size(const double factor) {
-    size_t newsize = m_table_size*factor;
-    AvlTree<Key ,Data>** newtable = new AvlTree<Key ,Data>*[newsize];
+    int newsize = m_table_size*factor;
+    AvlTree<Key ,Data*>** newtable = new AvlTree<Key ,Data*>*[newsize];
     for (int i = 0; i < newsize; ++i) {
         newtable[i] = nullptr;
     }
 
     int hashed_index;
     int temp_tree_size;
-    typename AvlTree<Key,Data>::Key_Data_pair** keyDataPair_array = nullptr;
+    typename AvlTree<Key,Data*>::Key_Data_pair** keyDataPair_array = nullptr;
 
     for (int i = 0; i < m_table_size && m_tree_table[i] != nullptr; ++i) {
         keyDataPair_array = m_tree_table[i]->get_tree_as_array(); //get the data from old tree in the i slot
@@ -98,7 +102,7 @@ void HashTable<Key, Data>::change_size(const double factor) {
         for (int j = 0; j < temp_tree_size; ++j) { // re-hashing the data
             hashed_index = m_hash_func(keyDataPair_array[j]->key,newsize);
             if(newtable[hashed_index] == nullptr){
-                newtable[hashed_index] = new AvlTree<Key , Data>();
+                newtable[hashed_index] = new AvlTree<Key , Data*>();
             }
             newtable[hashed_index]->insert(keyDataPair_array[j]->key,keyDataPair_array[j]->data);
             delete keyDataPair_array[j];

@@ -1,6 +1,6 @@
 #include "olympics24a2.h"
 
-olympics_t::olympics_t() :m_number_of_teams(0) , m_table(hash_func) , m_team_tree(new AvlTree<int,Team*>)
+olympics_t::olympics_t() :m_number_of_teams(0) , m_table(new HashTable<int ,Team>(hash_func)) , m_team_tree(new AvlTree<int,Team*>)
 {
 	// TODO: Your code goes here
 }
@@ -18,7 +18,7 @@ StatusType olympics_t::add_team(int teamId)
     }
 	try{
         Team* newTeam = new Team(teamId);
-        m_table.insert(newTeam->get_id_ref() , newTeam);
+        m_table->insert(newTeam->get_id_ref() , newTeam); /// here
         m_team_tree->insert(newTeam->getStrength() , newTeam);
         m_number_of_teams++;
 
@@ -39,7 +39,7 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
     if (teamId <= 0 || playerStrength <= 0){
         return  StatusType::INVALID_INPUT;
     }
-    Team* team = *m_table.search(teamId);
+    Team* team = m_table->search(teamId);/// here
     if (team == nullptr){
         return StatusType::FAILURE;
     }
@@ -58,7 +58,7 @@ StatusType olympics_t::remove_newest_player(int teamId)
     if(teamId <= 0){
         return StatusType::INVALID_INPUT;
     }
-    Team* team = *m_table.search(teamId);
+    Team* team = m_table->search(teamId);/// here
 
     if(team == nullptr || team->get_size() == 0){
         return  StatusType::FAILURE;
@@ -74,8 +74,8 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
     if(teamId1 <= 0 || teamId2 <= 0 || teamId2 == teamId1){
         return StatusType::INVALID_INPUT;
     }
-    Team* team1 = *m_table.search(teamId1);
-    Team* team2 = *m_table.search(teamId2);
+    Team* team1 = m_table->search(teamId1);
+    Team* team2 = m_table->search(teamId2);
     if (team1 == nullptr || team2 == nullptr || team1->get_size() == 0 || team2->get_size() == 0){
         return StatusType::FAILURE;
     }
@@ -88,7 +88,7 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
     if (teamId <= 0){
         return StatusType::INVALID_INPUT;
     }
-    Team* team = *m_table.search(teamId);
+    Team* team = m_table->search(teamId);
     if(team == nullptr){
         return StatusType::FAILURE;
     }
@@ -114,8 +114,8 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     if(teamId1 <= 0 || teamId2 <= 0 || teamId2 == teamId1){
         return StatusType::INVALID_INPUT;
     }
-    Team* team1 = *m_table.search(teamId1);
-    Team* team2 = *m_table.search(teamId2);
+    Team* team1 = m_table->search(teamId1);
+    Team* team2 = m_table->search(teamId2);
     if (team1 == nullptr || team2 == nullptr){
         return StatusType::FAILURE;
     }
