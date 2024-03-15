@@ -17,7 +17,7 @@ public:
 
 	Node* find(const Key& key, const Data& data = NULL);
 	//Node* findWithData(const Key& key, const Data & data);
-    bool insert(const Key& key, const Data& data, bool enableDulications = false);
+    bool insert(const Key& key, const Data& data, int teamStrength=0, bool enableDulications = false);
 	void remove(const Key& key, const Data& data = NULL);
 	//void removeWithData(const Key& key, const Data& data);
 	int getSize();
@@ -39,9 +39,18 @@ public:
 	Node* getNextNode(Node* node, Node* prevNode = nullptr, bool goRight = true);
 	Node* getPrevNode(Node* node, Node* prevNode = nullptr, bool goLeft = true);
 
+    struct Key_Data_pair{
+        const Key& key;
+        const Data& data;
+        Key_Data_pair(const Key& key_val,const Data& data_val):key(key_val),data(data_val){}
+    };
+    Key_Data_pair** get_tree_as_array();
+
+
 	int getNodeRank(Node* node);
 	Node* getNodeByIndex(int index);
 	int getNodeCalculatedValue(Node* node);
+	void updateMaxRank(Node* curNode, Node* destMode=nullptr);
 
 private:
 	Node* m_root;
@@ -50,10 +59,34 @@ private:
 	void deleteTree(Node* node);
 	Node* findAux(Node* root, const Key& key, const Data& data = NULL) ;
 	//Node* findAuxWithData(Node* root, const Key& key, const Data& data) ;
-	Node* insertAux(const Key& key, const Data& data, Node* curNode, Node* parent, Node* newNode, bool enableDuplications = false, int reduceValue =0);
+	Node* insertAux(const Key& key, const Data& data, Node* curNode, Node* parent, Node* newNode, int teamStrength = 0, bool enableDuplications = false, int reduceValue = 0);
 	Node* removeAux(Node* curNode);
 
+    void aux_inorder_tree_to_array(TreeNode<Key,Data>* node,Key_Data_pair** array , int &i);
+
 };
+
+/// returns an array with key data pairs in order (according to inorder iteration)
+/// \tparam Key
+/// \tparam Data
+/// \return array with key data pairs , this function passes the ownership of the array to the caller
+template<class Key, class Data>
+typename AvlTree<Key, Data>::Key_Data_pair** AvlTree<Key, Data>::get_tree_as_array() {
+    Key_Data_pair** array = new Key_Data_pair*[this->m_size];
+    int i = 0;
+    aux_inorder_tree_to_array(this->m_root,array,i);
+    return array;
+}
+
+template<class Key, class Data>
+void AvlTree<Key, Data>::aux_inorder_tree_to_array(TreeNode<Key,Data>* node,Key_Data_pair** array , int &i) {
+    if (node == nullptr){
+        return;
+    }
+    aux_inorder_tree_to_array(node->m_left , array,i);
+    array[i++] = new Key_Data_pair(node->getKey(),node->getData());
+    aux_inorder_tree_to_array(node->m_right , array,i);
+}
 
 template<class Key, class Data>
 void AvlTree<Key, Data>::setSize(int size) {
@@ -66,6 +99,8 @@ void AvlTree<Key, Data>::setValueToNodes(Node* startNode, Node* endNode, int val
 	setValueToNodesAux(startNode, m_root, value, false);
 	if(Node* prev = getPrevNode(endNode))
 		setValueToNodesAux(prev, m_root, -value, false);	
+	updateMaxRank(m_root,startNode);
+	updateMaxRank(m_root, endNode);
 }
 
 template<class Key, class Data>
@@ -123,6 +158,7 @@ void AvlTree<Key, Data>::deleteTreeData(Node* node)
 	deleteTreeData(node->m_left);
 	deleteTreeData(node->m_right);
 	node->deleteData();
+    node->setData(nullptr);
 }
 
 
@@ -176,19 +212,19 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findAux(Node* root, const
 //}
 
 template <class Key, class Data>
-bool AvlTree<Key, Data>::insert(const Key& key, const Data& data, bool enableDuplications)//put this function under try catch
+bool AvlTree<Key, Data>::insert(const Key& key, const Data& data, int teamStrength, bool enableDuplications)//put this function under try catch
 {
 	if (!enableDuplications && find(key, data))
 		return false;
 
 	Node* newNode = new Node(key, data);
-	m_root = insertAux(key, data, m_root, nullptr, newNode, enableDuplications);
+	m_root = insertAux(key, data, m_root, nullptr, newNode, teamStrength, enableDuplications);
 	m_size++;
 	return true;;
 }
 
 template <class Key, class Data>
-typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::insertAux(const Key& key, const Data& data, Node* curNode, Node* parent, Node* newNode, bool enableDuplications, int reduceValue)
+typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::insertAux(const Key& key, const Data& data, Node* curNode, Node* parent, Node* newNode,int teamStrength, bool enableDuplications, int reduceValue)
 {
 	if (!curNode)
 	{
@@ -196,6 +232,7 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::insertAux(const Key& key,
 		curNode->m_parent = parent;
 		curNode->setSubTreeSize(1);
 		curNode->setValue(-reduceValue);
+		curNode->setTeamStrength(teamStrength);
 	}
 	else
 	{
@@ -204,20 +241,20 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::insertAux(const Key& key,
 		if (curNode->getKey() == key)
 		{
 			if (curNode->getData() > data)
-				curNode->m_left = insertAux(key, data, curNode->m_left, curNode, newNode, enableDuplications, reduceValue);
+				curNode->m_left = insertAux(key, data, curNode->m_left, curNode, newNode, teamStrength, enableDuplications, reduceValue);
 			else
-				curNode->m_right = insertAux(key, data, curNode->m_right, curNode, newNode, enableDuplications, reduceValue);
+				curNode->m_right = insertAux(key, data, curNode->m_right, curNode, newNode, teamStrength, enableDuplications, reduceValue);
 
 		}
 		else if (curNode->getKey() > key)
-			curNode->m_left = insertAux(key, data, curNode->m_left, curNode, newNode, enableDuplications, reduceValue);
+			curNode->m_left = insertAux(key, data, curNode->m_left, curNode, newNode, teamStrength, enableDuplications, reduceValue);
 		else
-			curNode->m_right = insertAux(key, data, curNode->m_right, curNode, newNode, enableDuplications, reduceValue);
+			curNode->m_right = insertAux(key, data, curNode->m_right, curNode, newNode, teamStrength, enableDuplications, reduceValue);
 
 
 		int curNodeRank = (curNode->m_right ? curNode->m_right->getSubTreeSize() : 0) + (curNode->m_left ? curNode->m_left->getSubTreeSize() : 0) + 1;
 		curNode->setSubTreeSize(curNodeRank);
-		
+		curNode->updateHeight();
 
 		if (abs(curNode->getBF()) > 1)
 		{
@@ -424,7 +461,7 @@ template<class Key, class Data>
 typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
 {
 	if (index <= 0 || index > m_size)
-		throw new exception("Should noot get here");
+		throw ("Should not get here");
 
 	Node* temp = m_root;
 	int curIndex = 0;
@@ -450,12 +487,14 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
 template<class Key, class Data>
 int AvlTree<Key, Data>::getNodeCalculatedValue(Node* node)
 {
+	if (!node)
+		throw ("Should not get here");
+
 	Node* temp = m_root;
-	int counter = 0;
+	int sum = 0;
 	while (temp != node)
 	{
-		counter += temp->getValue();
-
+		sum += temp->getValue();
 		//go left 
 		if (temp->getKey() > node->getKey() || (temp->getKey() == node->getKey() && temp->getData() > node->getData()))
 		{
@@ -467,9 +506,28 @@ int AvlTree<Key, Data>::getNodeCalculatedValue(Node* node)
 			temp = temp->m_right;
 		}
 	}
+	sum += temp->getValue();
+	return sum;
+}
 
-	counter += temp->getValue();
-	return counter;
+template<class Key, class Data>
+void AvlTree<Key, Data>::updateMaxRank(Node* curNode, Node* destNode)
+{
+	if (curNode == destNode)
+	{
+		curNode->updateHeight();
+		return;
+	}
+	if (curNode->getKey() > destNode->getKey() || (curNode->getKey() == destNode->getKey() && curNode->getData() > destNode->getData()))
+	{
+		updateMaxRank(curNode->m_left, destNode);
+	}
+	//go right
+	else
+	{
+		updateMaxRank(curNode->m_right, destNode);
+	}
+	curNode->updateHeight();
 }
 
 template <class Key, class Data>

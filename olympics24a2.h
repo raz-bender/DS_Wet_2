@@ -16,12 +16,21 @@
 #define OLYMPICSA2_H_
 
 #include "wet2util.h"
+#include "HashTable.h"
+#include "Team.h"
+
+static auto hash_func = [](int team_id , int table_size){
+    return (team_id)%table_size;
+};
 
 class olympics_t {
 private:
 	//
 	// Here you may add anything you want
-	//
+	// im the number one ranger this side of the mississippi
+
+    AvlTree<int , Team*> m_team_tree;
+    HashTable<int , Team*> m_table;
 	
 public:
 	// <DO-NOT-MODIFY> {

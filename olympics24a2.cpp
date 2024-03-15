@@ -1,6 +1,6 @@
 #include "olympics24a2.h"
 
-olympics_t::olympics_t()
+olympics_t::olympics_t() : m_table(hash_func) , m_team_tree()
 {
 	// TODO: Your code goes here
 }

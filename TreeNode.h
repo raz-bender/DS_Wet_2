@@ -1,7 +1,6 @@
 #ifndef Tree_Node_H
 #define Tree_Node_H
 
-
 template<class Key, class Data>
 class TreeNode
 {
@@ -13,10 +12,12 @@ public:
 	const Data& getData()const;
 	const Key& getKey()const;
 	const int getValue()const;
+	const int getTeamStrength()const;
 	const int getSubTreeSize()const;
 	const int getSubTreeMaxRank()const;
 	void setData(const Data&);
 	void setValue(const int);
+	void setTeamStrength(const int);
 	void setSubTreeSize(const int);
 	void setSubTreeMaxRank(const int);
 	void setKey(const Key&);
@@ -37,6 +38,7 @@ private:
 	int m_value;
 	int m_subTreeSize;
 	int m_subTreeMaxRank;
+	int m_teamStrength;
 
 	TreeNode* rollLL(TreeNode* node);
 	TreeNode* rollLR(TreeNode* node);
@@ -54,7 +56,9 @@ TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data)
 	m_parent = nullptr;
 	m_height = 0;
 	m_value = 0;
+	m_subTreeSize = 0;
 	m_subTreeMaxRank = 0;
+	m_teamStrength = 0;
 }
 
 template<class Key, class Data>
@@ -92,6 +96,12 @@ const int TreeNode<Key, Data>::getValue()const
 }
 
 template<class Key, class Data>
+const int TreeNode<Key, Data>::getTeamStrength() const
+{
+	return m_teamStrength;
+}
+
+template<class Key, class Data>
 const int TreeNode<Key, Data>::getSubTreeSize() const
 {
 	return m_subTreeSize;
@@ -107,6 +117,12 @@ template<class Key, class Data>
 void TreeNode<Key, Data>::setValue(const int value)
 {
 	m_value = value;
+}
+
+template<class Key, class Data>
+void TreeNode<Key, Data>::setTeamStrength(const int strength)
+{
+	m_teamStrength = strength;
 }
 
 template<class Key, class Data>
@@ -160,20 +176,29 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollLL(TreeNode* node)
 	TreeNode* newRoot = node->m_left;
 
 	//update sub tree size
-	int newRootSubSize = (newRoot->m_right ? newRoot->m_right->getSubTreeSize() : 0) + (node->m_right ? node->m_right->getSubTreeSize() : 0) +  1;
-	int oldRootSubSize = newRootSubSize +  (newRoot->m_left ? newRoot->m_left->getSubTreeSize() : 0) + 1;
+	int newRootSubSize = (newRoot->m_right ? newRoot->m_right->getSubTreeSize() : 0) + (node->m_right ? node->m_right->getSubTreeSize() : 0) + 1;
+	int oldRootSubSize = newRootSubSize + (newRoot->m_left ? newRoot->m_left->getSubTreeSize() : 0) + 1;
 	node->setSubTreeSize(newRootSubSize);
 	newRoot->setSubTreeSize(oldRootSubSize);
 
 	//update value
 	int newRootValue = newRoot->getValue() + node->getValue();
 	int oldRootValue = node->getValue() - newRootValue;
-	
+
 	if (newRoot->m_right)
 		newRoot->m_right->setValue(newRoot->m_right->getValue() + newRoot->getValue());
 
 	node->setValue(oldRootValue);
 	newRoot->setValue(newRootValue);
+
+	//update max strength
+	int oldRooteMaxRank = std::max(std::max((node->m_left ? node->m_left->getSubTreeMaxRank() : 0),
+		(newRoot->m_left ? newRoot->m_left->getSubTreeMaxRank() : 0)), node->m_teamStrength) + oldRootValue;
+	int newRooteMaxRank = std::max(std::max((newRoot->m_right ? newRoot->m_right->getSubTreeMaxRank() : 0),
+		oldRooteMaxRank), newRoot->m_teamStrength) + newRootValue;
+
+	node->setSubTreeMaxRank(oldRooteMaxRank);
+	newRoot->setSubTreeMaxRank(newRooteMaxRank);
 
 	node->m_left = newRoot->m_right;
 	if (newRoot->m_right)
@@ -229,12 +254,20 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollRR(TreeNode* node)
 	int newRootValue = newRoot->getValue() + node->getValue();
 	int oldRootValue = node->getValue() - newRootValue;
 
-
 	if (newRoot->m_left)
 		newRoot->m_left->setValue(newRoot->m_left->getValue() + newRoot->getValue());
 
 	node->setValue(oldRootValue);
 	newRoot->setValue(newRootValue);
+
+	//update max strength
+	int oldRooteMaxRank = std::max(std::max((node->m_right ? node->m_right->getSubTreeMaxRank() : 0),
+		(newRoot->m_right ? newRoot->m_right->getSubTreeMaxRank() : 0)), node->m_teamStrength) + oldRootValue;
+	int newRooteMaxRank = std::max(std::max((newRoot->m_left ? newRoot->m_left->getSubTreeMaxRank() : 0),
+		oldRooteMaxRank), newRoot->m_teamStrength) + newRootValue;
+
+	node->setSubTreeMaxRank(oldRooteMaxRank);
+	newRoot->setSubTreeMaxRank(newRooteMaxRank);
 
 	node->m_right = newRoot->m_left;
 	if (newRoot->m_left)
@@ -261,9 +294,7 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollRR(TreeNode* node)
 		node->m_parent->updateHeight();
 
 	return node;
-
 }
-
 
 template<class Key, class Data>
 void TreeNode<Key, Data>::updateHeight()
@@ -279,6 +310,7 @@ void TreeNode<Key, Data>::updateHeight()
 	int curNodeRank = (m_right ? m_right->getSubTreeSize() : 0) + (m_left ? m_left->getSubTreeSize() : 0) + 1;
 	this->setSubTreeSize(curNodeRank);
 
-	int curNodeMaxRank = max((m_right ? m_right->getSubTreeSize() : 0), (m_left ? m_left->getSubTreeSize() : 0), m_);
+	int curNodeMakeRank = std::max(std::max((m_right ? m_right->getSubTreeMaxRank() : 0), (m_left ? m_left->getSubTreeMaxRank() : 0)), m_teamStrength) + m_value;
+	this->setSubTreeMaxRank(curNodeMakeRank);
 }
 #endif
