@@ -26,13 +26,14 @@ class HashTable {
     void Decrease_size();
     void change_size(double factor);
 public:
-    HashTable(HashFunction functionPtr);
+    explicit HashTable(HashFunction functionPtr);
+    HashTable() = delete;
 
     ~HashTable();
 
     StatusType insert(Key& key,Data& val);
 
-    const Data* search(Key& key,Data& val);
+    Data* search(Key& key)const;
 
     StatusType remove(Key& key,Data& val);
 

@@ -42,12 +42,14 @@ public:
     StatusType remove_newest_player();
 
     int getStrength() const;
+    bool play_match(Team* team2);
 
     AvlTree<int, Player *>::Key_Data_pair** get_team_player_array();
 
     void merge_team_into_me(Team* team2);
 
     void add_point();
+    int get_number_of_wins()const;
 
     //for testing
     int get_median_strength(){

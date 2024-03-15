@@ -27,7 +27,7 @@ HashTable<Key,Data>::~HashTable() {
 template<class Key , class Data>
 StatusType HashTable<Key, Data>::insert(Key& key,Data& val) {//change to bool
 
-    if (this->search(key,val) != nullptr){
+    if (this->search(key) != nullptr){
         return StatusType::FAILURE;//already exist in the data structure
     }
     if(this->m_size + 1 >= this->m_table_size * INCREASE_FACTOR){
@@ -45,7 +45,7 @@ StatusType HashTable<Key, Data>::insert(Key& key,Data& val) {//change to bool
 }
 
 template<class Key , class Data>
-const Data* HashTable<Key, Data>::search(Key& key,Data& val) {
+ Data* HashTable<Key, Data>::search(Key& key) const{
 
     int hash_index = m_hash_func(key, m_table_size);
     if (m_tree_table[hash_index] == nullptr){
@@ -57,7 +57,7 @@ const Data* HashTable<Key, Data>::search(Key& key,Data& val) {
 template<class Key , class Data>
 StatusType HashTable<Key, Data>::remove(Key& key,Data& val) {
 
-    if (this->search(key,val) == nullptr){
+    if (this->search(key) == nullptr){
         return StatusType::FAILURE;//doesn't exist in the data structure
     }
     int hash_index = m_hash_func(key,m_table_size);
