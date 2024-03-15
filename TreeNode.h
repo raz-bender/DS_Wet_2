@@ -14,9 +14,11 @@ public:
 	const Key& getKey()const;
 	const int getValue()const;
 	const int getSubTreeSize()const;
+	const int getSubTreeMaxRank()const;
 	void setData(const Data&);
 	void setValue(const int);
 	void setSubTreeSize(const int);
+	void setSubTreeMaxRank(const int);
 	void setKey(const Key&);
 	int getHeight()const;
 	void setHeight(int);
@@ -34,13 +36,12 @@ private:
 	int m_height;
 	int m_value;
 	int m_subTreeSize;
+	int m_subTreeMaxRank;
 
 	TreeNode* rollLL(TreeNode* node);
 	TreeNode* rollLR(TreeNode* node);
 	TreeNode* rollRL(TreeNode* node);
 	TreeNode* rollRR(TreeNode* node);
-
-
 };
 
 template<class Key, class Data>
@@ -53,6 +54,7 @@ TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data)
 	m_parent = nullptr;
 	m_height = 0;
 	m_value = 0;
+	m_subTreeMaxRank = 0;
 }
 
 template<class Key, class Data>
@@ -96,6 +98,12 @@ const int TreeNode<Key, Data>::getSubTreeSize() const
 }
 
 template<class Key, class Data>
+const int TreeNode<Key, Data>::getSubTreeMaxRank() const
+{
+	return m_subTreeMaxRank;
+}
+
+template<class Key, class Data>
 void TreeNode<Key, Data>::setValue(const int value)
 {
 	m_value = value;
@@ -105,6 +113,12 @@ template<class Key, class Data>
 inline void TreeNode<Key, Data>::setSubTreeSize(const int size)
 {
 	m_subTreeSize = size;
+}
+
+template<class Key, class Data>
+void TreeNode<Key, Data>::setSubTreeMaxRank(const int rank)
+{
+	m_subTreeMaxRank = rank;
 }
 
 template<class Key, class Data>
@@ -264,5 +278,7 @@ void TreeNode<Key, Data>::updateHeight()
 
 	int curNodeRank = (m_right ? m_right->getSubTreeSize() : 0) + (m_left ? m_left->getSubTreeSize() : 0) + 1;
 	this->setSubTreeSize(curNodeRank);
+
+	int curNodeMaxRank = max((m_right ? m_right->getSubTreeSize() : 0), (m_left ? m_left->getSubTreeSize() : 0), m_);
 }
 #endif
