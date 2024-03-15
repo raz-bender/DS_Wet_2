@@ -526,7 +526,7 @@ void AvlTree<Key, Data>::printBinaryTreeAux(Node* root, int depth, char prefix) 
 		std::cout << "   ";
 	}
 
-	std::cout << prefix << root->getKey() << std::endl;
+	std::cout << prefix << root->getKey() << ",s:" << root->getSubTreeSize() << " " << std::endl;
 
 	printBinaryTreeAux(root->m_left, depth + 1, '|');
 }

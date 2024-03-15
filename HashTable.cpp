@@ -15,10 +15,9 @@ HashTable<Key,Data>::HashTable(HashFunction functionPtr) : m_size(0) , m_table_s
 
 template<class Key , class Data>
 HashTable<Key,Data>::~HashTable() {
-    //deletes the tree nodes not the data
     for (int i = 0; i < m_table_size; ++i) {
           if(m_tree_table[i] != nullptr){
-              m_tree_table[i]->deleteTreeData(m_tree_table[i]->getRoot());//deletes the newcpp
+              m_tree_table[i]->deleteTreeData(m_tree_table[i]->getRoot());//deletes the tree data
               delete m_tree_table[i];
           }
     }

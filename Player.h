@@ -30,6 +30,19 @@ public:
         m_player_strength = strength;
     }
 
+    bool operator<(const Player& other) const{
+        return this->m_player_strength < other.m_player_strength;
+    }
+    bool operator>(const Player& other) const{
+        return this->m_player_strength > other.m_player_strength;
+    }
+    bool operator>=(const Player& other) const{
+        return !(*this < other);
+    }
+    bool operator<=(Player& other){
+        return !(*this > other);
+    }
+
     void print(){
         cout << "\n player : " << this->m_teamId << " strength : " << this->m_player_strength << "\n";
     }

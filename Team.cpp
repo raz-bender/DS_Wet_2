@@ -66,7 +66,7 @@ StatusType Team::remove_newest_player() {
 }
 
 int Team::getStrength() const {
-    return m_median_player->getPlayerStrength() * m_size;
+    return m_size == 0 ? 0 : m_median_player->getPlayerStrength() * m_size;
 }
 
 int Team::get_id() const {
@@ -100,9 +100,9 @@ Pair_Ptr_arr Team::merge_arrays_key_data_pair(Pair_Ptr_arr arr1, int size1, Pair
             newArr[i] = arr2[l++];
         }else if(l >= size2){
             newArr[i] = arr1[k++];
-        }else if (arr1[k]->data <= arr2[l]->data){
+        }else if (*arr1[k]->data <= *arr2[l]->data){
             newArr[i] = arr1[k++];
-        }else if (arr1[k]->data > arr2[l]->data){
+        }else if (*arr1[k]->data > *arr2[l]->data){
             newArr[i] = arr2[l++];
         }
     }
@@ -113,6 +113,9 @@ Pair_Ptr_arr Team::merge_arrays_key_data_pair(Pair_Ptr_arr arr1, int size1, Pair
 /// dosnt delete team2 but empties it , deletes tree nodes and list is empty
 /// \param team2
 void Team::merge_team_into_me(Team* team2) {
+    if(team2 == nullptr || team2->m_size == 0){
+        return;
+    }
     Pair_Ptr_arr arr1 = this->get_team_player_array();
     Pair_Ptr_arr  arr2 = team2->get_team_player_array();
     Pair_Ptr_arr unite_arr = merge_arrays_key_data_pair(arr1 , this->m_size , arr2 , team2->get_size());
@@ -214,5 +217,9 @@ void Team::aux_insert_data_to_tree(TreeNode<int, Player *> *root, Pair_Ptr_arr a
     }
     i += 1;
     aux_insert_data_to_tree(root->m_right,arr,i , height - 1 , teamId);
+}
+
+void Team::add_point() {
+    m_num_of_wins++;
 }
 

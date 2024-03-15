@@ -47,6 +47,8 @@ public:
 
     void merge_team_into_me(Team* team2);
 
+    void add_point();
+
     //for testing
     int get_median_strength(){
         return this->m_median_player->getPlayerStrength();

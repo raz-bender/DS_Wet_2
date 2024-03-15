@@ -19,7 +19,7 @@ using namespace std;
 void print(string cmd, StatusType res);
 void print(string cmd, output_t<int> res);
 
-int main()
+int main1()
 {
 
     int d1, d2;
