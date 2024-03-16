@@ -20,7 +20,6 @@ StatusType olympics_t::add_team(int teamId)
 	try{
         Team* newTeam = new Team(teamId);
         m_table->insert(newTeam->get_id_ref() , newTeam);
-        m_team_tree->insert(newTeam->getStrength() , newTeam);
         m_number_of_teams++;
 
     }catch(bad_alloc& e){
@@ -60,6 +59,8 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
     }
 	try{
         team->add_player(playerStrength);
+        if(team->get_size() == 0 && !m_team_tree->find(teamId))
+            m_team_tree->insert(teamId, team, playerStrength);
         // TODO need to update the tree before exiting function
         // todo raz 15/03
     }catch(bad_alloc& e){
@@ -81,6 +82,12 @@ StatusType olympics_t::remove_newest_player(int teamId)
     team->remove_newest_player();
 
     // TODO update the tree after change in team strength
+    auto oldNode = m_team_tree->find(teamId);
+    int numOfWins = m_team_tree->getNodeCalculatedNumOfWins(oldNode);
+    m_team_tree->remove(teamId);
+    team->set_points(team->get_number_of_wins() + numOfWins);
+    m_team_tree->insert(teamId, team, team->getStrength());
+
 	return StatusType::SUCCESS;
 }
 
@@ -112,7 +119,7 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
         return 0; // is in hash but not in tree
     }
 
-    return m_team_tree->getNodeCalculatedValue(teamNode);
+    return m_team_tree->getNodeCalculatedNumOfWins(teamNode);
 
 //    static int i = 0; // ???????
 //    return (i++==0) ? 11 : 2;

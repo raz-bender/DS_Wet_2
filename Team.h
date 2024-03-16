@@ -51,6 +51,8 @@ public:
     void add_point();
     int get_number_of_wins()const;
 
+    void set_points(int points);
+
     //for testing
     int get_median_strength(){
         return this->m_median_player->getPlayerStrength();

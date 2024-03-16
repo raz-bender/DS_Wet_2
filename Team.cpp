@@ -245,3 +245,8 @@ int Team::get_number_of_wins() const {
     return m_num_of_wins;
 }
 
+void Team::set_points(int points)
+{
+    m_num_of_wins = points;
+}
+
