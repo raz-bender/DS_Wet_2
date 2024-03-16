@@ -42,10 +42,6 @@ public:
     bool operator<=(Player& other){
         return !(*this > other);
     }
-
-    void print(){
-        std::cout << "\n player : " << this->m_teamId << " strength : " << this->m_player_strength << "\n";
-    }
 };
 
 
