@@ -28,10 +28,10 @@ private:
 	//
 	// Here you may add anything you want
 	// im the number one ranger this side of the mississippi
+    int m_number_of_teams;
+    HashTable<int , Team>* m_table;
+    AvlTree<int , Team*>* m_team_tree;
 
-    AvlTree<int , Team*> m_team_tree;
-    HashTable<int , Team*> m_table;
-	
 public:
 	// <DO-NOT-MODIFY> {
 

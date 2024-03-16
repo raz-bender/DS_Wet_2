@@ -1,22 +1,20 @@
 //
 // Created by raz29 on 09/03/2024.
 //
-
 #include "Team.h"
 #include "math.h"
 
 
-Team::Team(const int teamId): m_id(teamId) , m_size(0),m_num_of_wins(0)
-, m_players(new AvlTree<int ,Player*>()) , m_newest_player(new List<Player*>()){}
+Team::Team(const int teamId): m_id(teamId) , m_size(0),m_num_of_wins(0) , m_median_player(nullptr)
+, m_newest_player(new List<Player*>()) , m_players(new AvlTree<int ,Player*>()) {}
 
 Team::~Team() {
     if (this->m_newest_player != nullptr) {
-       m_newest_player->Delete_list_and_Data();
-    }//deletes the players in the list
+       m_newest_player->Delete_list_and_Data();//deletes the players in the list
+    }
     //m_players->deleteTreeData(m_players->getRoot());
     delete m_players;
     delete m_newest_player;
-   // m_players.deleteTreeData(m_players.getRoot()); // deletes the players in the tree
 }
 
 int Team::get_size() const {
@@ -58,9 +56,9 @@ StatusType Team::remove_newest_player() {
     delete player;
     m_size--;
     if(m_size == 0){
-        m_median_player == nullptr;
+        m_median_player = nullptr;
     }else{
-       set_median();
+      this->set_median();
     }
     return StatusType::SUCCESS;
 }
@@ -77,7 +75,7 @@ int& Team::get_id_ref(){
 }
 
 void Team::set_median() {
-    int median_index = floor(this->get_size()/2);
+    int median_index = (int)floor(this->get_size()/2);
     m_median_player = m_players->getNodeByIndex(median_index + 1)->getData();
 }
 
@@ -92,7 +90,7 @@ AvlTree<int, Player *>::Key_Data_pair** Team::get_team_player_array() {
 /// \param arr2 NOT DELETED
 /// \param size2
 Pair_Ptr_arr Team::merge_arrays_key_data_pair(Pair_Ptr_arr arr1, int size1, Pair_Ptr_arr arr2, int size2){
-    size_t newsize= size1 + size2;
+    int newsize= size1 + size2;
     Pair_Ptr_arr newArr = new AvlTree<int , Player*>::Key_Data_pair*[newsize];
     int k = 0 , l = 0;
     for (int i = 0; i < newsize ; ++i) {
@@ -159,8 +157,8 @@ void Team::merge_team_into_me(Team* team2) {
 AvlTree<int, Player *> *Team::create_tree_from_array(Pair_Ptr_arr arr,int size) {
     AvlTree<int ,Player*>* newTree = new AvlTree<int ,Player*>;
 
-    int height = ceil(std::log2(size+1) ) -1 ;
-    int redundant = pow(2,height+1)-1-size;
+    int height = (int)ceil(std::log2(size+1) ) -1 ;
+    int redundant = (int)pow(2,height+1)-1-size;
     int i = 0;
     newTree->insert(0 , nullptr);
     aux_create_empty_tree(newTree->getRoot() , nullptr ,redundant , height);
@@ -221,5 +219,29 @@ void Team::aux_insert_data_to_tree(TreeNode<int, Player *> *root, Pair_Ptr_arr a
 
 void Team::add_point() {
     m_num_of_wins++;
+}
+
+bool Team::play_match(Team *team2) {
+    int strength_team1 = this->getStrength();
+    int strength_team2 = team2->getStrength();
+
+    if (strength_team1 > strength_team2){
+        this->add_point();
+        return true;
+    }else if (strength_team1 < strength_team2){
+        team2->add_point();
+        return false;
+    }else{//strength_team1 == strength_team2
+        if(this->get_id() < team2->get_id()){
+            this->add_point();
+            return true;
+        }
+    }
+    team2->add_point();
+    return false;
+}
+
+int Team::get_number_of_wins() const {
+    return m_num_of_wins;
 }
 

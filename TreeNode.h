@@ -9,7 +9,7 @@ public:
 	~TreeNode() = default;
 	int getBF() const;
 	TreeNode* roll();
-	const Data& getData()const;
+    Data& getData();
 	const Key& getKey()const;
 	const int getValue()const;
 	const int getTeamStrength()const;
@@ -72,7 +72,7 @@ int TreeNode<Key, Data>::TreeNode::getBF() const
 }
 
 template<class Key, class Data>
-const Data& TreeNode<Key, Data>::getData()const
+ Data& TreeNode<Key, Data>::getData()
 {
 	return this->m_data;
 }
