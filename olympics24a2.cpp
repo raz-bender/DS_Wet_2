@@ -7,7 +7,8 @@ olympics_t::olympics_t() :m_number_of_teams(0) , m_table(new HashTable<int ,Team
 
 olympics_t::~olympics_t()
 {
-	// TODO: Your code goes here
+	delete m_table;
+    delete m_team_tree;
 }
 
 
@@ -18,7 +19,7 @@ StatusType olympics_t::add_team(int teamId)
     }
 	try{
         Team* newTeam = new Team(teamId);
-        m_table->insert(newTeam->get_id_ref() , newTeam); /// here
+        m_table->insert(newTeam->get_id_ref() , newTeam);
         m_team_tree->insert(newTeam->getStrength() , newTeam);
         m_number_of_teams++;
 
@@ -30,7 +31,21 @@ StatusType olympics_t::add_team(int teamId)
 
 StatusType olympics_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
+    if (teamId <= 0){
+        return  StatusType::INVALID_INPUT;
+    }
+    Team* team = m_table->search(teamId);
+    if (team == nullptr){
+        return StatusType::FAILURE;
+    }
+
+    m_team_tree->remove(teamId);
+	// TODO: check if the tree updated its fields correctly in accordance to init logic
+
+    m_table->remove(teamId);///here
+    delete team;
+    m_number_of_teams--;
+
 	return StatusType::SUCCESS;
 }
 

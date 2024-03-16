@@ -32,7 +32,7 @@ public:
 
     Data* search(Key& key)const;
 
-    StatusType remove(Key& key,Data* val);
+    StatusType remove(Key& key);
 
     size_t get_table_size()const;
 

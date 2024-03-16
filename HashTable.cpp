@@ -3,6 +3,7 @@
 //
 #ifndef HASH_TABLE_CPP
 #define HASH_TABLE_CPP
+
 #include "HashTable.h"
 static int INIT_SIZE = 32;
 static double INCREASE_FACTOR = 8;
@@ -59,7 +60,7 @@ template<class Key , class Data>
 }
 
 template<class Key , class Data>
-StatusType HashTable<Key, Data>::remove(Key& key,Data* val) {
+StatusType HashTable<Key, Data>::remove(Key& key) {
 
     if (this->search(key) == nullptr){
         return StatusType::FAILURE;//doesn't exist in the data structure

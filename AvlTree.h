@@ -485,6 +485,7 @@ template<class Key, class Data>
 int AvlTree<Key, Data>::getNodeCalculatedValue(Node* node)
 {
 
+    return -1;
 }
 
 template <class Key, class Data>

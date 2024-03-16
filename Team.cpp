@@ -1,7 +1,6 @@
 //
 // Created by raz29 on 09/03/2024.
 //
-
 #include "Team.h"
 #include "math.h"
 
