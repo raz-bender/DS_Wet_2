@@ -254,7 +254,7 @@ void test_turni(){
     assert(olympics->num_wins_for_team(60).ans() == 0);
     olympics->m_team_tree->printExtraTree();
     assert(olympics->num_wins_for_team(7).ans() == 1);
-    /*
+
     assert(olympics->num_wins_for_team(8).ans() == 1);
     assert(olympics->num_wins_for_team(9).ans() == 2);
     assert(olympics->num_wins_for_team(10).ans() == 3);
@@ -453,7 +453,7 @@ void test_turni(){
     assert(olympics->num_wins_for_team(15).ans() == 3);
     assert(olympics->num_wins_for_team(16).ans() == 4);
 
-     */
+
 
     delete olympics;
 }
