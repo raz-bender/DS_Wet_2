@@ -112,15 +112,15 @@ void AvlTree<Key, Data>::setValueToNodesAux(Node* node, Node* curNode, int value
 	if (curNode == node)
 	{
 		if (!prevRight)
-			curNode->setNumOfWins(curNode->getNumOfWins() + value);
+			curNode->setExtraNumOfWins(curNode->getExtraNumOfWins() + value);
 		if(curNode->m_right)
-			curNode->m_right->setNumOfWins(curNode->m_right->getNumOfWins() - value);
+			curNode->m_right->setExtraNumOfWins(curNode->m_right->getExtraNumOfWins() - value);
 	}
 	//go left 
 	else if (curNode->getKey() > node->getKey() || (curNode->getKey() == node->getKey() && curNode->getData() < node->getData()))
 	{
 		if(prevRight)
-			curNode->setNumOfWins(curNode->getNumOfWins() - value);
+			curNode->setExtraNumOfWins(curNode->getExtraNumOfWins() - value);
 
 		setValueToNodesAux(node, curNode->m_left, value, false);
 	}
@@ -128,7 +128,7 @@ void AvlTree<Key, Data>::setValueToNodesAux(Node* node, Node* curNode, int value
 	else
 	{
 		if(!prevRight)
-			curNode->setNumOfWins(curNode->getNumOfWins() + value);
+			curNode->setExtraNumOfWins(curNode->getExtraNumOfWins() + value);
 		setValueToNodesAux(node, curNode->m_right, value, true);
 	}
 }
@@ -262,11 +262,11 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::insertAux(const Key& key,
 		curNode = newNode;
 		curNode->m_parent = parent;
 		curNode->setSubTreeSize(1);
-		curNode->setNumOfWins(-reduceValue);
+		curNode->setExtraNumOfWins(-reduceValue);
 	}
 	else
 	{
-		reduceValue += curNode->getNumOfWins();
+		reduceValue += curNode->getExtraNumOfWins();
 
 		if (curNode->getKey() == key)
 		{
@@ -362,7 +362,7 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::removeAux(Node* curNode)
 			if (child)
 			{
 				child->m_parent = nullptr;
-				child->setNumOfWins(child->getNumOfWins() + curNode->getNumOfWins());
+				child->setExtraNumOfWins(child->getExtraNumOfWins() + curNode->getExtraNumOfWins());
 			}
 		}
 
@@ -398,15 +398,15 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::removeAux(Node* curNode)
 		curNode->setData(nextNode->getData());
 
 		//calc the new roots number of wins
-		int newRootCalcNumOfWins = this->getNodeCalculatedNumOfWins(nextNode, curNode);
-		int oldRootCalcNumOfWins = curNode->getNumOfWins();
+		int newRootCalcExtraNumOfWins = this->getNodeCalculatedNumOfWins(nextNode, curNode);
+		int oldRootCalcExtraNumOfWins = curNode->getExtraNumOfWins();
 
 		//set the new root num of wins
-		curNode->setNumOfWins(newRootCalcNumOfWins);
+		curNode->setExtraNumOfWins(newRootCalcExtraNumOfWins);
 		
 		//remove the new root num of wins from his sons and add the old root num of wins
-		curNode->m_left->setNumOfWins(curNode->m_left->getNumOfWins() + oldRootCalcNumOfWins - newRootCalcNumOfWins);
-		curNode->m_right->setNumOfWins(curNode->m_right->getNumOfWins() + oldRootCalcNumOfWins - newRootCalcNumOfWins);
+		curNode->m_left->setExtraNumOfWins(curNode->m_left->getExtraNumOfWins() + oldRootCalcExtraNumOfWins - newRootCalcExtraNumOfWins);
+		curNode->m_right->setExtraNumOfWins(curNode->m_right->getExtraNumOfWins() + oldRootCalcExtraNumOfWins - newRootCalcExtraNumOfWins);
 
 		curNode->m_left->updateHeight();
 		curNode->m_right->updateHeight();
@@ -540,7 +540,7 @@ int AvlTree<Key, Data>::getNodeCalculatedNumOfWins(Node* node, Node* root)
 	int sum = 0;
 	while (temp != node)
 	{
-		sum += temp->getNumOfWins();
+		sum += temp->getExtraNumOfWins();
 		//go left 
 		if (temp->getKey() > node->getKey() || (temp->getKey() == node->getKey() && temp->getData() < node->getData()))
 		{
@@ -552,7 +552,7 @@ int AvlTree<Key, Data>::getNodeCalculatedNumOfWins(Node* node, Node* root)
 			temp = temp->m_right;
 		}
 	}
-	sum += temp->getNumOfWins();
+	sum += temp->getExtraNumOfWins();
 	return sum;
 }
 
@@ -615,7 +615,7 @@ void AvlTree<Key, Data>::printBinaryTreeAux(Node* root, int depth, char prefix) 
 		std::cout << "   ";
 	}
 
-	std::cout << prefix << root->getKey() <<", " << root->getData()<<", "<< root->getNumOfWins()<< std::endl;
+	std::cout << prefix << root->getKey() <<", " << root->getData()<<", "<< root->getExtraNumOfWins()<< std::endl;
 
 	printBinaryTreeAux(root->m_left, depth + 1, '|');
 }
