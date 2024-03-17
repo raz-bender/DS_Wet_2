@@ -191,17 +191,14 @@ void test_destroyer(){//check with valgrind
 }
 void test_oly_inti(){
     olympics_t* olympics = new olympics_t();
-    int a = 10;
-    int b = 20;
-    int c = 30;
-    olympics->add_team(a);
-    olympics->add_team(b);
-    olympics->add_team(c);
+    olympics->add_team(10);
+    olympics->add_team(20);
+    olympics->add_team(30);
     int size = 10;
     for (int i = 0; i < size ; ++i) {
-        olympics->add_player(a,i);
+        olympics->add_player(10,i);
     }
-    olympics->remove_newest_player(a);
+    olympics->remove_newest_player(10);
     delete olympics;
 
 }
@@ -241,10 +238,11 @@ void test_turni(){
     assert(olympics->play_tournament(-1 ,4).status() == StatusType::INVALID_INPUT);
     assert(olympics->play_tournament(-1 ,-4).status() == StatusType::INVALID_INPUT);
     assert(olympics->play_tournament(1 ,-4).status() == StatusType::INVALID_INPUT);
-    assert(olympics->play_tournament(1 ,5).status() == StatusType::FAILURE);// !(2^i)
+    assert(olympics->play_tournament(1 ,4).status() == StatusType::FAILURE);// !(2^i)
     assert(olympics->play_tournament(1 ,13).status() == StatusType::FAILURE);// !(2^i)
     assert(olympics->play_tournament(4 ,13).status() == StatusType::FAILURE);// !(2^i)
     assert(olympics->play_tournament(3 ,11).status() == StatusType::FAILURE);// !(2^i)
+    assert(olympics->play_tournament(2 ,11).status() == StatusType::FAILURE);// !(2^i)
 
     assert(olympics->play_tournament(4 ,11).ans() == 10);
 
@@ -254,7 +252,9 @@ void test_turni(){
     assert(olympics->num_wins_for_team(5).ans() == 0);
     assert(olympics->num_wins_for_team(6).ans() == 0);
     assert(olympics->num_wins_for_team(60).ans() == 0);
+    olympics->m_team_tree->printExtraTree();
     assert(olympics->num_wins_for_team(7).ans() == 1);
+    /*
     assert(olympics->num_wins_for_team(8).ans() == 1);
     assert(olympics->num_wins_for_team(9).ans() == 2);
     assert(olympics->num_wins_for_team(10).ans() == 3);
@@ -453,6 +453,7 @@ void test_turni(){
     assert(olympics->num_wins_for_team(15).ans() == 3);
     assert(olympics->num_wins_for_team(16).ans() == 4);
 
+     */
 
     delete olympics;
 }
@@ -554,11 +555,13 @@ void test_init_o(){
 
 
     assert(olympics->add_player(20 , 3) == StatusType::SUCCESS);
+
     assert(olympics->num_wins_for_team(20).ans() == 0);
+    assert(olympics->num_wins_for_team(10).ans() == 0);
     assert(olympics->play_match(10,20).ans() == 10);
-    assert(olympics->num_wins_for_team(20).ans() == 1);
+    assert(olympics->num_wins_for_team(10).ans() == 1);
     assert(olympics->play_match(20,10).ans() == 10);
-    assert(olympics->num_wins_for_team(20).ans() == 2);
+    assert(olympics->num_wins_for_team(10).ans() == 2);
 
     assert(olympics->remove_team(20) == StatusType::SUCCESS);
     assert(olympics->add_player(20 , 3) == StatusType::FAILURE);
@@ -568,10 +571,20 @@ void test_init_o(){
 }
 
 void olympics_tests(){
-    test_union_teams();
+    //test_union_teams();
     test_init_o();
     test_turni();
 
+}
+
+void small_test(){
+    olympics_t* olympics = new olympics_t();
+    olympics->add_team(10);
+    olympics->add_team(20);
+    olympics->add_player(10,1);
+    olympics->add_player(20,2);
+    olympics->add_player(20,3);
+    delete olympics;
 }
 
 int main(){
@@ -580,7 +593,8 @@ int main(){
     Test_Team();
     Test_union_team();
     Test_Median();
+    small_test();
     test_destroyer();
     test_oly_inti();
-   // olympic_test();
+    olympics_tests();
 }

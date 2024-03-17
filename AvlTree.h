@@ -35,6 +35,8 @@ public:
 	Node* getMinNode();
 	void printBinaryTree(int depth = 0, char prefix = '-');
 	void printBinaryTreeAux(Node* root, int depth = 0, char prefix = '-');
+    void printExtraTree(int depth = 0, char prefix = '-');
+    void printExtraTreeAux(Node* root, int depth = 0, char prefix = '-');
 
 
 	Node* getNextNode(Node* node, Node* prevNode = nullptr, bool goRight = true);
@@ -183,10 +185,14 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostLeft(const Key& k
 {
 	Node* ans = nullptr;
 	Node* temp = m_root;
-	while (temp != nullptr)
-	{
-		if (temp->getKey() == key)
-			ans = temp;
+	while (temp != nullptr) {
+        if (temp->getKey() == key) {
+            ans = temp;
+        } else if(ans == nullptr && temp->getKey() > key){
+            ans = temp;
+        }else if(ans != nullptr && (temp->getKey() > key && temp->getKey() < ans->getKey())){
+            ans = temp;
+        }
 		temp = temp->getKey() < key ? temp->m_right : temp->m_left;
 	}
 	return ans;
@@ -199,8 +205,13 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostRight(const Key& 
 	Node* temp = m_root;
 	while (temp != nullptr)
 	{
-		if (temp->getKey() == key)
-			ans = temp;
+		if (temp->getKey() == key){
+            ans = temp;
+        } else if (ans == nullptr && temp->getKey() < key){
+            ans = temp;
+        }else if( ans != nullptr && (temp->getKey() < key && temp->getKey() > ans->getKey()) ){
+            ans = temp;
+        }
 		temp = temp->getKey() <= key ? temp->m_right : temp->m_left;
 	}
 	return ans;
@@ -615,9 +626,30 @@ void AvlTree<Key, Data>::printBinaryTreeAux(Node* root, int depth, char prefix) 
 		std::cout << "   ";
 	}
 
-	std::cout << prefix << root->getKey() <<", " << root->getData()<<", "<< root->getExtraNumOfWins()<< std::endl;
+	std::cout << prefix << root->getKey() <<", " << root->getData()<<", num:"<< this->getNodeCalculatedNumOfWins(root) << " + " << root->getNumOfWins()<< std::endl;
 
 	printBinaryTreeAux(root->m_left, depth + 1, '|');
+}
+template <class Key, class Data>
+void AvlTree<Key, Data>::printExtraTree(int depth , char prefix ) {
+    printExtraTreeAux(this->m_root, depth, prefix);
+    cout << "\n ------------------ \n";
+}
+
+template <class Key, class Data>
+void AvlTree<Key, Data>::printExtraTreeAux(Node* root, int depth, char prefix) {
+    if (root == nullptr)
+        return;
+
+    printExtraTreeAux(root->m_right, depth + 1, '+');
+
+    for (int i = 0; i < depth; i++) {
+        std::cout << "   ";
+    }
+
+    std::cout << prefix << root->getData() << "s:"<< this->getNodeCalculatedNumOfWins(root) << std::endl;
+
+    printExtraTreeAux(root->m_left, depth + 1, '|');
 }
 
 
