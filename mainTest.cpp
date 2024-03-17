@@ -568,7 +568,9 @@ void test_init_o(){
 }
 
 void olympics_tests(){
-
+    test_union_teams();
+    test_init_o();
+    test_turni();
 
 }
 
