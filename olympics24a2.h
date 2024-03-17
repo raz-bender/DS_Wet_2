@@ -30,11 +30,14 @@ private:
 	// im the number one ranger this side of the mississippi
     int m_number_of_teams;
     HashTable<int , Team>* m_table;
-    AvlTree<int , Team*>* m_team_tree;
+    //strength , id
+
+
+    void update_team_strength_in_tree(TreeNode<int ,int >* teamNode);
 
 public:
 	// <DO-NOT-MODIFY> {
-
+    AvlTree<int , int>* m_team_tree;
     olympics_t();
 
 	virtual ~olympics_t();

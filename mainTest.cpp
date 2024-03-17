@@ -252,7 +252,6 @@ void test_turni(){
     assert(olympics->num_wins_for_team(5).ans() == 0);
     assert(olympics->num_wins_for_team(6).ans() == 0);
     assert(olympics->num_wins_for_team(60).ans() == 0);
-    olympics->m_team_tree->printExtraTree();
     assert(olympics->num_wins_for_team(7).ans() == 1);
 
     assert(olympics->num_wins_for_team(8).ans() == 1);
@@ -360,6 +359,7 @@ void test_turni(){
 
     olympics->remove_team(8);
 
+
     assert(olympics->num_wins_for_team(1).ans() == 0);
     assert(olympics->num_wins_for_team(3).ans() == 0);
     assert(olympics->num_wins_for_team(4).ans() == 1);
@@ -369,10 +369,11 @@ void test_turni(){
     assert(olympics->num_wins_for_team(7).ans() == 3);
     assert(olympics->num_wins_for_team(8).status() == StatusType::FAILURE);
     assert(olympics->num_wins_for_team(9).ans() == 5);
-    assert(olympics->num_wins_for_team(10).ans() == 3);
+    assert(olympics->num_wins_for_team(10).ans() == 4);
     assert(olympics->num_wins_for_team(13).ans() == 1);
 
     olympics->add_team(8);
+    olympics->add_player(8,8);
 
     assert(olympics->num_wins_for_team(1).ans() == 0);
     assert(olympics->num_wins_for_team(3).ans() == 0);
@@ -383,23 +384,23 @@ void test_turni(){
     assert(olympics->num_wins_for_team(7).ans() == 3);
     assert(olympics->num_wins_for_team(8).ans() == 0);
     assert(olympics->num_wins_for_team(9).ans() == 5);
-    assert(olympics->num_wins_for_team(10).ans() == 3);
+    assert(olympics->num_wins_for_team(10).ans() == 4);
     assert(olympics->num_wins_for_team(13).ans() == 1);
 
     olympics->add_team(14);
     olympics->add_team(15);
     olympics->add_team(16);
     olympics->add_team(40);
-    olympics->add_team(10);
+    olympics->add_team(100);
 
     olympics->add_player(14,14);
     olympics->add_player(15,15);
     olympics->add_player(16,16);
     olympics->add_player(40,4);
-    olympics->add_player(10,1);
+    olympics->add_player(100,1);
 
     assert(olympics->num_wins_for_team(1).ans() == 0);
-    assert(olympics->num_wins_for_team(10).ans() == 0);
+    assert(olympics->num_wins_for_team(100).ans() == 0);
     assert(olympics->num_wins_for_team(3).ans() == 0);
     assert(olympics->num_wins_for_team(4).ans() == 1);
     assert(olympics->num_wins_for_team(40).ans() == 0);
@@ -409,7 +410,7 @@ void test_turni(){
     assert(olympics->num_wins_for_team(7).ans() == 3);
     assert(olympics->num_wins_for_team(8).ans() == 0);
     assert(olympics->num_wins_for_team(9).ans() == 5);
-    assert(olympics->num_wins_for_team(10).ans() == 3);
+    assert(olympics->num_wins_for_team(10).ans() == 4);
     assert(olympics->num_wins_for_team(13).ans() == 1);
     assert(olympics->num_wins_for_team(14).ans() == 0);
     assert(olympics->num_wins_for_team(15).ans() == 0);
@@ -418,7 +419,7 @@ void test_turni(){
     assert(olympics->play_tournament(1,16).ans() == 16);
 
     assert(olympics->num_wins_for_team(1).ans() == 0);
-    assert(olympics->num_wins_for_team(10).ans() == 0);
+    assert(olympics->num_wins_for_team(100).ans() == 0);
     assert(olympics->num_wins_for_team(3).ans() == 0);
     assert(olympics->num_wins_for_team(4).ans() == 1);
     assert(olympics->num_wins_for_team(40).ans() == 0);
@@ -428,7 +429,7 @@ void test_turni(){
     assert(olympics->num_wins_for_team(7).ans() == 4);
     assert(olympics->num_wins_for_team(8).ans() == 1);
     assert(olympics->num_wins_for_team(9).ans() == 6);
-    assert(olympics->num_wins_for_team(10).ans() == 4);
+    assert(olympics->num_wins_for_team(10).ans() == 5);
     assert(olympics->num_wins_for_team(13).ans() == 3);
     assert(olympics->num_wins_for_team(14).ans() == 2);
     assert(olympics->num_wins_for_team(15).ans() == 3);
@@ -437,7 +438,7 @@ void test_turni(){
     assert(olympics->play_tournament(1,6).ans() == 6);
 
     assert(olympics->num_wins_for_team(1).ans() == 0);
-    assert(olympics->num_wins_for_team(10).ans() == 0);
+    assert(olympics->num_wins_for_team(100).ans() == 0);
     assert(olympics->num_wins_for_team(3).ans() == 0);
     assert(olympics->num_wins_for_team(4).ans() == 2);
     assert(olympics->num_wins_for_team(40).ans() == 0);
@@ -447,7 +448,7 @@ void test_turni(){
     assert(olympics->num_wins_for_team(7).ans() == 4);
     assert(olympics->num_wins_for_team(8).ans() == 1);
     assert(olympics->num_wins_for_team(9).ans() == 6);
-    assert(olympics->num_wins_for_team(10).ans() == 4);
+    assert(olympics->num_wins_for_team(10).ans() == 5);
     assert(olympics->num_wins_for_team(13).ans() == 3);
     assert(olympics->num_wins_for_team(14).ans() == 2);
     assert(olympics->num_wins_for_team(15).ans() == 3);

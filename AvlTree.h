@@ -99,10 +99,10 @@ void AvlTree<Key, Data>::setSize(int size) {
 template<class Key, class Data>
 void AvlTree<Key, Data>::setValueToNodes(Node* startNode, Node* endNode, int value)
 {
-	setValueToNodesAux(startNode, m_root, value, false);
+	setValueToNodesAux(startNode, m_root, -value, false);
 	if (endNode)
 	{
-		setValueToNodesAux(endNode, m_root, -value, false);
+		setValueToNodesAux(endNode, m_root, value, false);
 		updateMaxRank(m_root, endNode);
 	}
 	updateMaxRank(m_root,startNode);
@@ -498,7 +498,7 @@ int AvlTree<Key, Data>::getNodeIndex(Node* node)
 	while (temp != node)
 	{
 		//go left 
-		if (temp->getKey() > node->getKey() || (temp->getKey() == node->getKey() && temp->getData() > node->getData()))
+		if (temp->getKey() > node->getKey() || ( temp->getKey() == node->getKey() && temp->getData() < node->getData() ) )
 		{
 			temp =   temp->m_left;
 		}
@@ -626,7 +626,7 @@ void AvlTree<Key, Data>::printBinaryTreeAux(Node* root, int depth, char prefix) 
 		std::cout << "   ";
 	}
 
-	std::cout << prefix << root->getKey() <<", " << root->getData()<<", num:"<< this->getNodeCalculatedNumOfWins(root) << " + " << root->getNumOfWins()<< std::endl;
+	std::cout << prefix << root->getKey() <<", " << root->getData()<<", num:"<< this->getNodeCalculatedNumOfWins(root) << " + " << root->getExtraNumOfWins()<< std::endl;
 
 	printBinaryTreeAux(root->m_left, depth + 1, '|');
 }
