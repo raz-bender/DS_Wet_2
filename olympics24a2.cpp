@@ -106,12 +106,20 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
     }
     Team* team1 = m_table->search(teamId1);
     Team* team2 = m_table->search(teamId2);
+
     if (team1 == nullptr || team2 == nullptr || team1->get_size() == 0 || team2->get_size() == 0){
         return StatusType::FAILURE;
     }
-    // TODO update get_highest_ranked_team
+
+    auto team1Node = m_team_tree->find(team1->getStrength(), teamId1);
+    auto team2Node = m_team_tree->find(team2->getStrength(), teamId2);
 
     bool is_team1_won = team1->play_match(team2);
+    auto winningTeam = is_team1_won ? team1 : team2;
+    auto winningTeamNode = is_team1_won ? team1Node : team2Node;
+    winningTeamNode->setTeamNumOfWins(winningTeam->get_number_of_wins());
+    m_team_tree->updateMaxRankRecursively(winningTeamNode);
+
     return is_team1_won ? teamId1 : teamId2;
 }
 
@@ -133,8 +141,7 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
 
 output_t<int> olympics_t::get_highest_ranked_team()
 {
-	// TODO: Your code goes here
-    return 42;
+    return m_team_tree->get_highest_ranked_team();
 }
 
 StatusType olympics_t::unite_teams(int teamId1, int teamId2)
@@ -208,5 +215,5 @@ void olympics_t::update_team_strength_in_tree(TreeNode<int ,int >* teamNode){
 
     team->set_points(victory_points);
 
-    m_team_tree->insert(team->getStrength() , team->get_id());
+    m_team_tree->insert(team->getStrength() , team->get_id(), victory_points);
 }

@@ -5,7 +5,7 @@ template<class Key, class Data>
 class TreeNode
 {
 public:
-	explicit TreeNode(const Key& , const Data&, int teamNumOfWins = 0);
+	explicit TreeNode(const Key& , const Data&);
 	~TreeNode() = default;
 	int getBF() const;
 	TreeNode* roll();
@@ -13,13 +13,11 @@ public:
 	const Key& getKey()const;
 	const int getExtraNumOfWins()const;
 	const int getTeamNumOfWins() const;
-	const int getTeamStrength()const;
 	const int getSubTreeSize()const;
 	const int getSubTreeMaxRank()const;
 	void setData(const Data&);
 	void setExtraNumOfWins(const int);
 	void setTeamNumOfWins(const int teamNumOfWins);
-	void setTeamStrength(const int);
 	void setSubTreeSize(const int);
 	void setSubTreeMaxRank(const int);
 	void setKey(const Key&);
@@ -49,7 +47,7 @@ private:
 };
 
 template<class Key, class Data>
-TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data, int teamNumOfWins)
+TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data)
 {
 	m_key = key;
 	m_data = data;
@@ -57,10 +55,9 @@ TreeNode<Key, Data>::TreeNode(const Key& key, const Data& data, int teamNumOfWin
 	m_left = nullptr;
 	m_parent = nullptr;
 	m_height = 0;
-	m_teamNumOfWins = teamNumOfWins;
+	m_teamNumOfWins = 0;
 	m_extraExtraNumOfWins = 0;
 	m_subTreeSize = 0;
-	m_subTreeMaxRank = 0;
 	m_subTreeMaxRank = 0;
 }
 
@@ -196,9 +193,9 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollLL(TreeNode* node)
 
 	//update max strength
 	int oldRooteMaxRank = std::max(std::max((node->m_left ? node->m_left->getSubTreeMaxRank() : 0),
-		(newRoot->m_left ? newRoot->m_left->getSubTreeMaxRank() : 0)), (node->m_key + node->m_teamNumOfWins)) + oldRootValue;
+		(newRoot->m_left ? newRoot->m_left->getSubTreeMaxRank() : 0)), (node->m_key > 0 ? (node->m_key + node->m_teamNumOfWins):0)) + oldRootValue;
 	int newRooteMaxRank = std::max(std::max((newRoot->m_right ? newRoot->m_right->getSubTreeMaxRank() : 0),
-		oldRooteMaxRank), (newRoot->m_key + newRoot->m_teamNumOfWins)) + newRootValue;
+		oldRooteMaxRank), (newRoot->m_key > 0 ? (newRoot->m_key + newRoot->m_teamNumOfWins):0)) + newRootValue;
 
 	node->setSubTreeMaxRank(oldRooteMaxRank);
 	newRoot->setSubTreeMaxRank(newRooteMaxRank);
@@ -265,9 +262,9 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollRR(TreeNode* node)
 
 	//update max strength
 	int oldRooteMaxRank = std::max(std::max((node->m_right ? node->m_right->getSubTreeMaxRank() : 0),
-		(newRoot->m_right ? newRoot->m_right->getSubTreeMaxRank() : 0)), (node->m_key + node->m_teamNumOfWins)) + oldRootValue;
+		(newRoot->m_right ? newRoot->m_right->getSubTreeMaxRank() : 0)), (node->m_key>0?(node->m_key + node->m_teamNumOfWins):0)) + oldRootValue;
 	int newRooteMaxRank = std::max(std::max((newRoot->m_left ? newRoot->m_left->getSubTreeMaxRank() : 0),
-		oldRooteMaxRank), (newRoot->m_key + newRoot->m_teamNumOfWins)) + newRootValue;
+		oldRooteMaxRank), (newRoot->m_key>0?(newRoot->m_key + newRoot->m_teamNumOfWins):0)) + newRootValue;
 
 	node->setSubTreeMaxRank(oldRooteMaxRank);
 	newRoot->setSubTreeMaxRank(newRooteMaxRank);
@@ -313,7 +310,7 @@ void TreeNode<Key, Data>::updateHeight()
 	int curNodeRank = (m_right ? m_right->getSubTreeSize() : 0) + (m_left ? m_left->getSubTreeSize() : 0) + 1;
 	this->setSubTreeSize(curNodeRank);
 
-	int curNodeMakeRank = std::max(std::max((m_right ? m_right->getSubTreeMaxRank() : 0), (m_left ? m_left->getSubTreeMaxRank() : 0)), (m_key + m_teamNumOfWins)) + m_extraExtraNumOfWins;
+	int curNodeMakeRank = std::max(std::max((m_right ? m_right->getSubTreeMaxRank() : 0), (m_left ? m_left->getSubTreeMaxRank() : 0)), (m_key>0?(m_key + m_teamNumOfWins):0)) + m_extraExtraNumOfWins;
 	this->setSubTreeMaxRank(curNodeMakeRank);
 }
 #endif
