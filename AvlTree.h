@@ -479,7 +479,7 @@ int AvlTree<Key, Data>::getNodeIndex(Node* node)
 template<class Key, class Data>
 int AvlTree<Key, Data>::get_highest_ranked_team()
 {
-	return m_root->getSubTreeMaxRank();
+	return m_size == 0 ? -1 : m_root->getSubTreeMaxRank();
 }
 
 template<class Key, class Data>

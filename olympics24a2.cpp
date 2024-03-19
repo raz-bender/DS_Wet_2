@@ -2,6 +2,7 @@
 
 olympics_t::olympics_t() :m_number_of_teams(0) , m_table(new HashTable<int ,Team>(hash_func)) , m_team_tree(new AvlTree<int,int>)
 {
+
 	// TODO: Your code goes here
 }
 
@@ -42,15 +43,15 @@ StatusType olympics_t::remove_team(int teamId)
     }
 
     try{
-        m_team_tree->remove(teamId);
+        m_team_tree->remove(team->getStrength() ,teamId);
         m_table->remove(teamId);
+        m_number_of_teams--;
 
-        // TODO update get_highest_ranked_team
     }catch(bad_alloc& e){
         return StatusType::ALLOCATION_ERROR;
     }
     delete team;
-    m_number_of_teams--;
+
 	return StatusType::SUCCESS;
 }
 
@@ -90,9 +91,11 @@ StatusType olympics_t::remove_newest_player(int teamId)
     }
     try {
         TreeNode<int,int>* teamNode = m_team_tree->find(team->getStrength() , team->get_id());
+
         team->remove_newest_player();
+
         update_team_strength_in_tree(teamNode);
-        // TODO update get_highest_ranked_team
+
     }catch(bad_alloc& e){
         return StatusType::ALLOCATION_ERROR;
     }
@@ -141,6 +144,9 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
 
 output_t<int> olympics_t::get_highest_ranked_team()
 {
+    if(m_table->get_size() != 0 && m_team_tree->getSize() == 0){// i.e no teams that had players
+        return 0;
+    }
     return m_team_tree->get_highest_ranked_team();
 }
 
@@ -157,11 +163,14 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     TreeNode<int,int>* team1Node = m_team_tree->find(team1->getStrength() , team1->get_id());
     team1->merge_team_into_me(team2);
 
-    m_team_tree->remove(team2->getStrength(),teamId2);
-    m_table->remove(teamId2);
+    this->remove_team(teamId2);
 
-    update_team_strength_in_tree(team1Node);
-	// TODO update get_highest_ranked_team
+    if (team1Node == nullptr){//team1 was always empty
+        m_team_tree->insert(team1->getStrength() , team1->get_id());
+        team1Node = m_team_tree->find(team1->getStrength() , team1->get_id());
+        m_team_tree->updateMaxRankRecursively(team1Node);
+    }
+        update_team_strength_in_tree(team1Node);
 
     return StatusType::SUCCESS;
 }
@@ -196,10 +205,10 @@ output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
         indexMid = ceil((double)(indexLeft + indexRight)/2); // 7+0 /2 = 4 | (4+7)/2 = 6 | (6+7)/2 = 7
         midNode = m_team_tree->getNodeByIndex(indexMid - 1);// node index = 3 | node index = 5 | node index = 6
         m_team_tree->setValueToNodes(midNode , highNode , 1); // +1 to : 4,5,6,7 | +1 to : 6 ,7 | +1 to : 7
+        m_team_tree->updateMaxRankRecursively(midNode);/// here
         //m_team_tree->printExtraTree();
         indexLeft = indexMid; // leftIndex = 4 | leftIndex = 6 | leftIndex = 7
     }
-    // TODO update get_highest_ranked_team
 
     return highNode->getData();
 
@@ -216,4 +225,5 @@ void olympics_t::update_team_strength_in_tree(TreeNode<int ,int >* teamNode){
     team->set_points(victory_points);
 
     m_team_tree->insert(team->getStrength() , team->get_id(), victory_points);
+
 }

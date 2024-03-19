@@ -359,7 +359,6 @@ void test_turni(){
 
     olympics->remove_team(8);
 
-
     assert(olympics->num_wins_for_team(1).ans() == 0);
     assert(olympics->num_wins_for_team(3).ans() == 0);
     assert(olympics->num_wins_for_team(4).ans() == 1);
@@ -455,6 +454,44 @@ void test_turni(){
     assert(olympics->num_wins_for_team(16).ans() == 4);
 
 
+    assert(olympics->remove_newest_player(6) == StatusType::SUCCESS);
+    assert(olympics->remove_newest_player(6) == StatusType::FAILURE);
+
+    assert(olympics->num_wins_for_team(1).ans() == 0);
+    assert(olympics->num_wins_for_team(100).ans() == 0);
+    assert(olympics->num_wins_for_team(3).ans() == 0);
+    assert(olympics->num_wins_for_team(4).ans() == 2);
+    assert(olympics->num_wins_for_team(40).ans() == 0);
+    assert(olympics->num_wins_for_team(5).ans() == 4);
+    assert(olympics->num_wins_for_team(6).ans() == 5);
+    assert(olympics->num_wins_for_team(60).ans() == 2);
+    assert(olympics->num_wins_for_team(7).ans() == 4);
+    assert(olympics->num_wins_for_team(8).ans() == 1);
+    assert(olympics->num_wins_for_team(9).ans() == 6);
+    assert(olympics->num_wins_for_team(10).ans() == 5);
+    assert(olympics->num_wins_for_team(13).ans() == 3);
+    assert(olympics->num_wins_for_team(14).ans() == 2);
+    assert(olympics->num_wins_for_team(15).ans() == 3);
+    assert(olympics->num_wins_for_team(16).ans() == 4);
+
+    assert(olympics->remove_team(7) == StatusType::SUCCESS);
+
+    assert(olympics->num_wins_for_team(1).ans() == 0);
+    assert(olympics->num_wins_for_team(100).ans() == 0);
+    assert(olympics->num_wins_for_team(3).ans() == 0);
+    assert(olympics->num_wins_for_team(4).ans() == 2);
+    assert(olympics->num_wins_for_team(40).ans() == 0);
+    assert(olympics->num_wins_for_team(5).ans() == 4);
+    assert(olympics->num_wins_for_team(6).ans() == 5);
+    assert(olympics->num_wins_for_team(60).ans() == 2);
+    assert(olympics->num_wins_for_team(7).status() == StatusType::FAILURE);
+    assert(olympics->num_wins_for_team(8).ans() == 1);
+    assert(olympics->num_wins_for_team(9).ans() == 6);
+    assert(olympics->num_wins_for_team(10).ans() == 5);
+    assert(olympics->num_wins_for_team(13).ans() == 3);
+    assert(olympics->num_wins_for_team(14).ans() == 2);
+    assert(olympics->num_wins_for_team(15).ans() == 3);
+    assert(olympics->num_wins_for_team(16).ans() == 4);
 
     delete olympics;
 }
@@ -514,7 +551,7 @@ void test_union_teams(){
     assert(olympics->remove_team(30) == StatusType::FAILURE);
     assert(olympics->get_highest_ranked_team().ans() == 13); // team 10 | 1,4,5 - w:1
 
-    assert(olympics->unite_teams(3,1) == StatusType::SUCCESS);//{} U team1
+    assert(olympics->unite_teams(3,10) == StatusType::SUCCESS);//{} U team10
     assert(olympics->num_wins_for_team(10).status() == StatusType::FAILURE);
     assert(olympics->num_wins_for_team(3).ans() == 0);
     assert(olympics->get_highest_ranked_team().ans() == 12); // team 3 | 1,4,5 - w:0
@@ -571,10 +608,75 @@ void test_init_o(){
 
 }
 
+void test_ranked(){
+    olympics_t* olympics = new olympics_t();
+
+    assert(olympics->get_highest_ranked_team().ans() == -1);
+    olympics->add_team(10);
+    assert(olympics->get_highest_ranked_team().ans() == 0);
+    olympics->add_team(20);
+    assert(olympics->get_highest_ranked_team().ans() == 0);
+    olympics->add_team(30);
+    assert(olympics->get_highest_ranked_team().ans() == 0);
+    olympics->add_team(40);
+    assert(olympics->get_highest_ranked_team().ans() == 0);
+
+    olympics->add_player(10,1); // 1 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 1);
+    olympics->add_player(20,2);// 2 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 2);
+    olympics->add_player(10,3); //1 ,3 w: 0
+    assert(olympics->get_highest_ranked_team().ans() == 6);
+    olympics->add_player(10,5); //1 ,3,5 w: 0
+    assert(olympics->get_highest_ranked_team().ans() == 9);
+    olympics->add_player(10,1); //1,1,3,5 w: 0
+    assert(olympics->get_highest_ranked_team().ans() == 12);
+    olympics->add_player(10,1); //1,1,1,3,5 w: 0
+    assert(olympics->get_highest_ranked_team().ans() == 5);
+    olympics->add_player(40,4); // 4 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 5);
+    olympics->add_player(30,3); // 3 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 5);
+    olympics->add_player(40,8); // 4,8 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 16);
+
+    assert(olympics->remove_team(40) == StatusType::SUCCESS);
+    assert(olympics->get_highest_ranked_team().ans() == 5);
+
+    assert(olympics->unite_teams(20,30) == StatusType::SUCCESS);//2,3 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 6);
+
+    olympics->add_team(40);
+    assert(olympics->get_highest_ranked_team().ans() == 6);
+    olympics->add_player(40,4); // 4 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 6);
+
+    assert(olympics->play_match(10 , 40).ans() == 10);//1,1,1,3,5 w: 1 vs 4 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 6);
+    assert(olympics->play_match(10 , 40).ans() == 10);//1,1,1,3,5 w: 2 vs 4 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 7);
+    assert(olympics->play_match(10 , 40).ans() == 10);//1,1,1,3,5 w: 3 vs 4 w:0
+    assert(olympics->get_highest_ranked_team().ans() == 8);
+
+    assert(olympics->unite_teams(40 , 10) == StatusType::SUCCESS);//1,1,1,3,4,5 w: 0
+    assert(olympics->get_highest_ranked_team().ans() == 18);
+
+    assert(olympics->remove_newest_player(40) == StatusType::SUCCESS); //1,1,1,3,5 w: 0
+    cout << olympics->get_highest_ranked_team().ans();
+    assert(olympics->get_highest_ranked_team().ans() == 6); // team 20
+
+    assert(olympics->remove_newest_player(40) == StatusType::SUCCESS); //1,1,3,5 w: 0
+    assert(olympics->get_highest_ranked_team().ans() == 12); // team 20
+
+    delete olympics;
+
+}
+
 void olympics_tests(){
-    //test_union_teams();
-    test_init_o();
-    test_turni();
+//    test_init_o();
+//    test_union_teams();
+//    test_turni();
+    test_ranked();
 
 }
 
