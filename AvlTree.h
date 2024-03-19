@@ -116,8 +116,11 @@ void AvlTree<Key, Data>::setValueToNodesAux(Node* node, Node* curNode, int value
 	{
 		if (!prevRight)
 			curNode->setExtraNumOfWins(curNode->getExtraNumOfWins() + value);
-		if(curNode->m_right)
+		if (curNode->m_right)
+		{
 			curNode->m_right->setExtraNumOfWins(curNode->m_right->getExtraNumOfWins() - value);
+			curNode->m_right->updateHeight();
+		}
 	}
 	//go left 
 	else if (curNode->getKey() > node->getKey() || (curNode->getKey() == node->getKey() && curNode->getData() < node->getData()))
@@ -134,6 +137,7 @@ void AvlTree<Key, Data>::setValueToNodesAux(Node* node, Node* curNode, int value
 			curNode->setExtraNumOfWins(curNode->getExtraNumOfWins() + value);
 		setValueToNodesAux(node, curNode->m_right, value, true);
 	}
+	curNode->updateHeight();
 }
 
 template <class Key, class Data>

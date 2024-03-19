@@ -310,7 +310,7 @@ void TreeNode<Key, Data>::updateHeight()
 	int curNodeRank = (m_right ? m_right->getSubTreeSize() : 0) + (m_left ? m_left->getSubTreeSize() : 0) + 1;
 	this->setSubTreeSize(curNodeRank);
 
-	int curNodeMakeRank = std::max(std::max((m_right ? m_right->getSubTreeMaxRank() : 0), (m_left ? m_left->getSubTreeMaxRank() : 0)), (m_key>0?(m_key + m_teamNumOfWins):0)) + m_extraExtraNumOfWins;
-	this->setSubTreeMaxRank(curNodeMakeRank);
+	int curNodeMaxRank = std::max(std::max((m_right ? m_right->getSubTreeMaxRank() : 0), (m_left ? m_left->getSubTreeMaxRank() : 0)), (m_key > 0 ?  (m_key + m_teamNumOfWins):0)) + m_extraExtraNumOfWins;
+	this->setSubTreeMaxRank(curNodeMaxRank);
 }
 #endif

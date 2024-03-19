@@ -167,6 +167,7 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
         return StatusType::FAILURE;
     }
 
+    int team1OldStrength = team1->getStrength();
     int team2OldStrength = team2->getStrength();
 
 
@@ -174,7 +175,7 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
 
     this->remove_teamAux(teamId2, team2OldStrength);
 
-    TreeNode<int, int>* team1Node = m_team_tree->find(team1->getStrength(), team1->get_id());
+    TreeNode<int, int>* team1Node = m_team_tree->find(team1OldStrength, team1->get_id());
     if (team1Node == nullptr){//team1 was always empty
         m_team_tree->insert(team1->getStrength() , team1->get_id());
         team1Node = m_team_tree->find(team1->getStrength() , team1->get_id());
