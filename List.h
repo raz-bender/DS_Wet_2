@@ -76,6 +76,9 @@ public:
     void connect_list(List<T>& list2){
         list2.m_tail->next = this->m_head;
         this->m_head = list2.m_head;
+        if (!this->m_tail){
+            m_tail = list2.m_tail;
+        }
     }
     void print(){
         auto temp = m_head;

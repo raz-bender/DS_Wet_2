@@ -783,18 +783,71 @@ void small_test() {
     olympics->add_player(20, 3);
     delete olympics;
 }
+void test_list_deletion(){
+    List<Player*>* list = new List<Player*>;
+    Player** arrPlayer = new Player*[100];
+    for (int i = 0; i < 100; ++i) {
+        arrPlayer[i] = new Player(i,i);
+        list->addNode(arrPlayer[i]);
+    }
 
-int main1() {
-    simp();
-    Test_hash();
-    Test_Team();
-    Test_union_team();
-    Test_Median();
-    small_test();
-    test_destroyer();
-    test_oly_inti();
-    olympics_tests();
-    TestRankTree();
-    TestOtherTree();
+    List<Player*>* list2 = new List<Player*>;
+    Player** arrPlayer2 = new Player*[100];
+    for (int i = 0; i < 100; ++i) {
+        arrPlayer2[i] = new Player(i,i);
+        list2->addNode(arrPlayer2[i]);
+    }
+
+    list->connect_list(*list2);
+    list->Delete_list_and_Data();
+    delete list2;
+    delete list;
+    delete[] arrPlayer;
+    delete[] arrPlayer2;
+}
+void test_from_txt(){
+    olympics_t* olympics = new olympics_t();
+
+    olympics->add_team(39);
+    olympics->add_team(67);
+    olympics->add_team(183);
+    olympics->add_team(187);
+
+    olympics->add_player(39,4715);
+    olympics->add_player(39,644);
+    olympics->add_player(39,2671);
+    olympics->add_team(69);
+    olympics->add_player(39,7093);
+    olympics->add_player(69,7945);
+    olympics->add_player(39,4817);
+    olympics->add_player(69,3364);
+    olympics->add_player(69,4662);
+    olympics->add_player(39,1868);
+
+    olympics->unite_teams(67,39);
+    olympics->unite_teams(67,69);
+
+    olympics->unite_teams(183,187);
+    olympics->unite_teams(183,81);
+    olympics->unite_teams(183,67);
+
+    delete olympics;
+
+
+}
+
+int main() {
+    test_from_txt();
+//    simp();
+//    Test_hash();
+//    Test_Team();
+//    Test_union_team();
+//    Test_Median();
+//    small_test();
+//    test_destroyer();
+//    test_oly_inti();
+//    olympics_tests();
+//    TestRankTree();
+//    TestOtherTree();
     return 0;
 }
