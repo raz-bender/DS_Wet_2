@@ -34,25 +34,31 @@ StatusType olympics_t::add_team(int teamId)
 
 StatusType olympics_t::remove_team(int teamId)
 {
-    if (teamId <= 0){
+    return remove_teamAux(teamId);
+}
+
+StatusType olympics_t::remove_teamAux(int teamId, int teamStrength)
+{
+    if (teamId <= 0) {
         return  StatusType::INVALID_INPUT;
     }
     Team* team = m_table->search(teamId);
-    if (team == nullptr){
+    if (team == nullptr) {
         return StatusType::FAILURE;
     }
 
-    try{
-        m_team_tree->remove(team->getStrength() ,teamId);
+    try {
+        m_team_tree->remove(teamStrength <= -1 ? team->getStrength() : teamStrength, teamId);
         m_table->remove(teamId);
         m_number_of_teams--;
 
-    }catch(bad_alloc& e){
+    }
+    catch (bad_alloc& e) {
         return StatusType::ALLOCATION_ERROR;
     }
     delete team;
 
-	return StatusType::SUCCESS;
+    return StatusType::SUCCESS;
 }
 
 StatusType olympics_t::add_player(int teamId, int playerStrength)
@@ -160,17 +166,21 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     if (team1 == nullptr || team2 == nullptr){
         return StatusType::FAILURE;
     }
-    TreeNode<int,int>* team1Node = m_team_tree->find(team1->getStrength() , team1->get_id());
+
+    int team2OldStrength = team2->getStrength();
+
+
     team1->merge_team_into_me(team2);
 
-    this->remove_team(teamId2);
+    this->remove_teamAux(teamId2, team2OldStrength);
 
+    TreeNode<int, int>* team1Node = m_team_tree->find(team1->getStrength(), team1->get_id());
     if (team1Node == nullptr){//team1 was always empty
         m_team_tree->insert(team1->getStrength() , team1->get_id());
         team1Node = m_team_tree->find(team1->getStrength() , team1->get_id());
         m_team_tree->updateMaxRankRecursively(team1Node);
     }
-        update_team_strength_in_tree(team1Node);
+    update_team_strength_in_tree(team1Node);
 
     return StatusType::SUCCESS;
 }

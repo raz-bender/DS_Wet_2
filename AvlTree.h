@@ -369,6 +369,7 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::removeAux(Node* curNode)
 		// data to this node 
 		curNode->setKey(nextNode->getKey());
 		curNode->setData(nextNode->getData());
+		curNode->setTeamNumOfWins(nextNode->getTeamNumOfWins());
 
 		//calc the new roots number of wins
 		int newRootCalcExtraNumOfWins = this->getNodeCalculatedNumOfWins(nextNode, curNode);

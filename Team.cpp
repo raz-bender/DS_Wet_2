@@ -109,7 +109,7 @@ Pair_Ptr_arr Team::merge_arrays_key_data_pair(Pair_Ptr_arr arr1, int size1, Pair
 
 
 /// dosnt delete team2 but empties it , deletes tree nodes and list is empty
-/// \param team2
+/// returns the old strength of team 2
 void Team::merge_team_into_me(Team* team2) {
     if(team2 == nullptr || team2->m_size == 0){
         return;
