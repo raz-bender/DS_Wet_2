@@ -217,6 +217,7 @@ output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
         midNode = m_team_tree->getNodeByIndex(indexMid - 1);// node index = 3 | node index = 5 | node index = 6
         m_team_tree->setValueToNodes(midNode , highNode , 1); // +1 to : 4,5,6,7 | +1 to : 6 ,7 | +1 to : 7
         m_team_tree->updateMaxRankRecursively(midNode);/// here
+        m_team_tree->updateMaxRankRecursively(highNode);/// here
         //m_team_tree->printExtraTree();
         indexLeft = indexMid; // leftIndex = 4 | leftIndex = 6 | leftIndex = 7
     }
