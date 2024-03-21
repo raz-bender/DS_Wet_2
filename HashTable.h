@@ -7,6 +7,10 @@
 
 #include "wet2util.h"
 #include "AvlTree.h"
+static int INIT_SIZE = 32;
+static double INCREASE_FACTOR = 8;
+static double DECREASE_FACTOR = 0.25;//1/4
+static int MIN_SIZE = 8;
 
 template<class Key , class Data>
 class HashTable {
@@ -39,10 +43,7 @@ public:
     size_t get_size()const;
 };
 
-static int INIT_SIZE = 32;
-static double INCREASE_FACTOR = 8;
-static double DECREASE_FACTOR = 0.25;//1/4
-static int MIN_SIZE = 8;
+
 
 template<class Key, class Data>
 HashTable<Key, Data>::HashTable(HashFunction functionPtr) : m_size(0), m_table_size(INIT_SIZE)
@@ -130,7 +131,10 @@ void HashTable<Key, Data>::change_size(const double factor) {
     int temp_tree_size;
     typename AvlTree<Key, Data*>::Key_Data_pair** keyDataPair_array = nullptr;
 
-    for (int i = 0; i < m_table_size && m_tree_table[i] != nullptr; ++i) {
+    for (int i = 0; i < m_table_size ; ++i) {
+        if(m_tree_table[i] == nullptr){
+            continue;
+        }
         keyDataPair_array = m_tree_table[i]->get_tree_as_array(); //get the data from old tree in the i slot
         temp_tree_size = m_tree_table[i]->getSize();
 
