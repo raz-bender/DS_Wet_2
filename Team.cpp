@@ -157,7 +157,7 @@ void Team::merge_team_into_me(Team* team2) {
 AvlTree<int, Player *> *Team::create_tree_from_array(Pair_Ptr_arr arr,int size) {
     AvlTree<int ,Player*>* newTree = new AvlTree<int ,Player*>;
 
-    int height = (int)ceil(std::log2(size+1) ) -1 ;
+    int height = (int)ceil(log2(size+1) ) -1 ;
     int redundant = (int)pow(2,height+1)-1-size;
     int i = 0;
     newTree->insert(0 , nullptr);
