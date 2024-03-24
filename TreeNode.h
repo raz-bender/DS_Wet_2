@@ -186,7 +186,10 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollLL(TreeNode* node)
 	int oldRootValue = node->getExtraNumOfWins() - newRootValue;
 
 	if (newRoot->m_right)
+	{
 		newRoot->m_right->setExtraNumOfWins(newRoot->m_right->getExtraNumOfWins() + newRoot->getExtraNumOfWins());
+		newRoot->m_right->updateHeight();
+	}
 
 	node->setExtraNumOfWins(oldRootValue);
 	newRoot->setExtraNumOfWins(newRootValue);
@@ -255,7 +258,10 @@ TreeNode<Key, Data>* TreeNode<Key, Data>::rollRR(TreeNode* node)
 	int oldRootValue = node->getExtraNumOfWins() - newRootValue;
 
 	if (newRoot->m_left)
+	{
 		newRoot->m_left->setExtraNumOfWins(newRoot->m_left->getExtraNumOfWins() + newRoot->getExtraNumOfWins());
+		newRoot->m_left->updateHeight();
+	}
 
 	node->setExtraNumOfWins(oldRootValue);
 	newRoot->setExtraNumOfWins(newRootValue);

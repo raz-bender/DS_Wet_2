@@ -231,7 +231,7 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findAux(Node* root, const
 		return nullptr;
 	if (root->getKey() == key)
 	{
-		if(data==NULL || root->getData() == data)
+		if(data == NULL || root->getData() == data)
 			return root;
 		else
 			return root->getData() > data ? findAux(root->m_right, key, data) : findAux(root->m_left, key, data);
