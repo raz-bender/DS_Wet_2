@@ -205,7 +205,7 @@ output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
     if (amountOfTeams == 0){
         return StatusType::FAILURE;
     }else if(amountOfTeams == 1){
-        return StatusType::SUCCESS;
+        return highNode->getData();
     }
     if (ceil(log2(amountOfTeams)) != log2(amountOfTeams)){
         return StatusType::FAILURE;
