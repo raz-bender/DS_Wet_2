@@ -195,7 +195,8 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostLeft(const Key& k
             ans = temp;
         } else if(ans == nullptr && temp->getKey() > key){
             ans = temp;
-        }else if(ans != nullptr && (temp->getKey() > key && temp->getKey() < ans->getKey())){
+        }else if(ans != nullptr && ((temp->getKey() > key && temp->getKey() < ans->getKey() ) ||
+        (temp->getKey() == ans->getKey() && temp->getData() > ans->getData()))){
             ans = temp;
         }
 		temp = temp->getKey() < key ? temp->m_right : temp->m_left;
@@ -214,7 +215,8 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostRight(const Key& 
             ans = temp;
         } else if (ans == nullptr && temp->getKey() < key){
             ans = temp;
-        }else if( ans != nullptr && (temp->getKey() < key && temp->getKey() > ans->getKey()) ){
+        }else if( ans != nullptr && ((temp->getKey() < key && temp->getKey() > ans->getKey())
+         || (temp->getKey() == ans->getKey() && temp->getData() < ans->getData()))){
             ans = temp;
         }
 		temp = temp->getKey() <= key ? temp->m_right : temp->m_left;
