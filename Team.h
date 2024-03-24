@@ -5,7 +5,7 @@
 #ifndef WET24_TO_PUBLISH_TEAM_H
 #define WET24_TO_PUBLISH_TEAM_H
 #include "AvlTree.h"
-#include "list.h"
+#include "List.h"
 #include "wet2util.h"
 #include "Player.h"
 typedef AvlTree<int ,Player*>::Key_Data_pair** Pair_Ptr_arr;

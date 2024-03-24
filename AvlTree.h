@@ -524,7 +524,7 @@ int AvlTree<Key, Data>::getNodeCalculatedNumOfWins(Node* node, Node* root)
 
 	Node* temp = root ? root : m_root;
 	int sum = 0;
-	while (temp != node)
+	while (temp->getKey() != node->getKey() && temp->getData() != node->getData())
 	{
 		sum += temp->getExtraNumOfWins();
 		//go left 

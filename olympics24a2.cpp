@@ -99,8 +99,10 @@ StatusType olympics_t::remove_newest_player(int teamId)
         TreeNode<int,int>* teamNode = m_team_tree->find(team->getStrength() , team->get_id());
 
         team->remove_newest_player();
-
-        update_team_strength_in_tree(teamNode);
+        if (teamNode)
+        {
+            update_team_strength_in_tree(teamNode);
+        }
 
     }catch(bad_alloc& e){
         return StatusType::ALLOCATION_ERROR;
