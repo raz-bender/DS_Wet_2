@@ -99,10 +99,10 @@ StatusType olympics_t::remove_newest_player(int teamId)
         TreeNode<int,int>* teamNode = m_team_tree->find(team->getStrength() , team->get_id());
 
         team->remove_newest_player();
-        if (teamNode)
-        {
+        /*if (teamNode)
+        {*/
             update_team_strength_in_tree(teamNode);
-        }
+        //}
 
     }catch(bad_alloc& e){
         return StatusType::ALLOCATION_ERROR;
@@ -128,6 +128,7 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
     bool is_team1_won = team1->play_match(team2);
     auto winningTeam = is_team1_won ? team1 : team2;
     auto winningTeamNode = is_team1_won ? team1Node : team2Node;
+    winningTeam->set_points(winningTeamNode->getTeamNumOfWins() + 1);
     winningTeamNode->setTeamNumOfWins(winningTeam->get_number_of_wins());
     m_team_tree->updateMaxRankRecursively(winningTeamNode);
 
@@ -232,7 +233,7 @@ void olympics_t::update_team_strength_in_tree(TreeNode<int ,int >* teamNode){
 
     Team* team = m_table->search(teamNode->getData());
 
-    int victory_points = team->get_number_of_wins() + m_team_tree->getNodeCalculatedNumOfWins(teamNode);
+    int victory_points = teamNode->getTeamNumOfWins() + m_team_tree->getNodeCalculatedNumOfWins(teamNode);
 
     m_team_tree->remove(teamNode->getKey(),team->get_id());
 

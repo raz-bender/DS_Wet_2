@@ -19,9 +19,8 @@ using namespace std;
 void print(string cmd, StatusType res);
 void print(string cmd, output_t<int> res);
 
-int main1()
+int main()
 {
-
     int d1, d2;
 
     // Init

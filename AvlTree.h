@@ -361,6 +361,10 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::removeAux(Node* curNode)
 			}
 
 		}
+		if (child)
+		{
+			child->updateHeight();
+		}
 		Node* parent = curNode->m_parent;
 		delete curNode;
 		return parent;
@@ -371,22 +375,24 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::removeAux(Node* curNode)
 		// successor (smallest in the right subtree) 
 		Node* nextNode = getNextNode(curNode, curNode, true);
 
+		//calc the new roots number of wins
+		int newRootCalcExtraNumOfWins = this->getNodeCalculatedNumOfWins(nextNode, curNode);
+
 		// Copy the inorder successor's 
 		// data to this node 
 		curNode->setKey(nextNode->getKey());
 		curNode->setData(nextNode->getData());
-		curNode->setTeamNumOfWins(nextNode->getTeamNumOfWins());
 
-		//calc the new roots number of wins
-		int newRootCalcExtraNumOfWins = this->getNodeCalculatedNumOfWins(nextNode, curNode);
-		int oldRootCalcExtraNumOfWins = curNode->getExtraNumOfWins();
+		//int oldRootCalcExtraNumOfWins = curNode->getExtraNumOfWins();
 
-		//set the new root num of wins
-		curNode->setExtraNumOfWins(newRootCalcExtraNumOfWins);
-		
-		//remove the new root num of wins from his sons and add the old root num of wins
-		curNode->m_left->setExtraNumOfWins(curNode->m_left->getExtraNumOfWins() + oldRootCalcExtraNumOfWins - newRootCalcExtraNumOfWins);
-		curNode->m_right->setExtraNumOfWins(curNode->m_right->getExtraNumOfWins() + oldRootCalcExtraNumOfWins - newRootCalcExtraNumOfWins);
+		curNode->setTeamNumOfWins(nextNode->getTeamNumOfWins() + newRootCalcExtraNumOfWins- curNode->getExtraNumOfWins());
+
+		////set the new root num of wins
+		//curNode->setExtraNumOfWins(newRootCalcExtraNumOfWins);
+		//
+		////remove the new root num of wins from his sons and add the old root num of wins
+		//curNode->m_left->setExtraNumOfWins(curNode->m_left->getExtraNumOfWins() + oldRootCalcExtraNumOfWins - newRootCalcExtraNumOfWins);
+		//curNode->m_right->setExtraNumOfWins(curNode->m_right->getExtraNumOfWins() + oldRootCalcExtraNumOfWins - newRootCalcExtraNumOfWins);
 
 		curNode->m_left->updateHeight();
 		curNode->m_right->updateHeight();
@@ -492,7 +498,7 @@ int AvlTree<Key, Data>::get_highest_ranked_team()
 template<class Key, class Data>
 typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
 {
-	if (index <= 0 || index > m_size)
+	if (index <= 0 || index > this->getSize())
 		throw ("Should not get here");
 
 	Node* temp = m_root;
@@ -504,7 +510,6 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
 			break;
 		else if (curIndex < index)
 		{
-
 			temp = temp->m_right;
 		}
 		else
@@ -514,7 +519,7 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::getNodeByIndex(int index)
 		}
 	}
 	return temp;
-}
+	}
 
 template<class Key, class Data>
 int AvlTree<Key, Data>::getNodeCalculatedNumOfWins(Node* node, Node* root)
@@ -524,7 +529,7 @@ int AvlTree<Key, Data>::getNodeCalculatedNumOfWins(Node* node, Node* root)
 
 	Node* temp = root ? root : m_root;
 	int sum = 0;
-	while (temp->getKey() != node->getKey() && temp->getData() != node->getData())
+	while (temp->getKey() != node->getKey() || temp->getData() != node->getData())
 	{
 		sum += temp->getExtraNumOfWins();
 		//go left 

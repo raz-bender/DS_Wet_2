@@ -34,11 +34,11 @@ public:
         Node<T> *next = nullptr;
         while (current != nullptr) {
             next = current->next;
-            if (is_array){
+            /*if (is_array){
              delete[] current->data;
             }else{
                 delete current->data;
-            }
+            }*/
             delete current;
             current = next;
         }

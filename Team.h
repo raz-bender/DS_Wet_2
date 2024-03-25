@@ -7,24 +7,23 @@
 #include "AvlTree.h"
 #include "List.h"
 #include "wet2util.h"
-#include "Player.h"
-typedef AvlTree<int ,Player*>::Key_Data_pair** Pair_Ptr_arr;
+typedef AvlTree<int ,int>::Key_Data_pair** Pair_Ptr_arr;
 
 class Team {
     int m_id;
     int m_size;
     int m_num_of_wins;
-    Player* m_median_player;
-    List<Player*>* m_newest_player;
+    int m_median_player;
+    List<int>* m_newest_player;
     //strength player
-    AvlTree<int ,Player*>* m_players;
+    AvlTree<int ,int>* m_players;
 
     void set_median();
 
     Pair_Ptr_arr merge_arrays_key_data_pair(Pair_Ptr_arr arr1 , int size1 ,Pair_Ptr_arr arr2 , int size2);
-    AvlTree<int, Player*>* create_tree_from_array(Pair_Ptr_arr arr,int size);
-    void aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Player *>* parent , int& redundant, int height);
-    void aux_insert_data_to_tree(TreeNode<int , Player*>* root ,Pair_Ptr_arr arr , int &i ,int height , int teamId = -1);
+    AvlTree<int, int>* create_tree_from_array(Pair_Ptr_arr arr,int size);
+    void aux_create_empty_tree(TreeNode<int, int>* root ,TreeNode<int, int>* parent , int& redundant, int height);
+    void aux_insert_data_to_tree(TreeNode<int , int>* root ,Pair_Ptr_arr arr , int &i ,int height , int teamId = -1);
 
 public:
 
@@ -44,7 +43,7 @@ public:
     int getStrength() const;
     bool play_match(Team* team2);
 
-    AvlTree<int, Player *>::Key_Data_pair** get_team_player_array();
+    AvlTree<int, int>::Key_Data_pair** get_team_player_array();
 
     void merge_team_into_me(Team* team2);
 
@@ -55,7 +54,7 @@ public:
 
     //for testing
     int get_median_strength(){
-        return this->m_median_player->getPlayerStrength();
+        return this->m_median_player;
     }
     void print(){
         this->m_players->printBinaryTree();

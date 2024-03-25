@@ -5,8 +5,8 @@
 #include "math.h"
 
 
-Team::Team(const int teamId): m_id(teamId) , m_size(0),m_num_of_wins(0) , m_median_player(nullptr)
-, m_newest_player(new List<Player*>()) , m_players(new AvlTree<int ,Player*>()) {}
+Team::Team(const int teamId): m_id(teamId) , m_size(0),m_num_of_wins(0) , m_median_player(0)
+, m_newest_player(new List<int>()) , m_players(new AvlTree<int , int>()) {}
 
 Team::~Team() {
     if (this->m_newest_player != nullptr) {
@@ -29,18 +29,13 @@ StatusType Team::add_player(const int playerStrength) {
     if(playerStrength <= 0){
         return StatusType::INVALID_INPUT;
     }
-    try{
-    Player* newPlayer = new Player(this->m_id , playerStrength);
-    this->m_players->insert(newPlayer->getPlayerStrength() , newPlayer , true);
-    this->m_newest_player->addNode(newPlayer);
+    this->m_players->insert(playerStrength, playerStrength,0, true);
+    this->m_newest_player->addNode(playerStrength);
     m_size++;
-        if (m_size == 1){
-            m_median_player = newPlayer;
-        }else{
-            set_median();
-        }
-    }catch(bad_alloc& e){
-        return StatusType::ALLOCATION_ERROR;
+    if (m_size == 1){
+        m_median_player = playerStrength;
+    }else{
+        set_median();
     }
     return StatusType::SUCCESS;
 }
@@ -49,14 +44,12 @@ StatusType Team::remove_newest_player() {
     if(m_size == 0){
         return StatusType::FAILURE;
     }
-
     auto player = m_newest_player->get_head();
-    m_players->remove(player->getPlayerStrength(),player);
+    m_players->remove(player, player);
     m_newest_player->pop();
-    delete player;
     m_size--;
     if(m_size == 0){
-        m_median_player = nullptr;
+        m_median_player = 0;
     }else{
       this->set_median();
     }
@@ -64,7 +57,7 @@ StatusType Team::remove_newest_player() {
 }
 
 int Team::getStrength() const {
-    return m_size == 0 ? 0 : m_median_player->getPlayerStrength() * m_size;
+    return m_size == 0 ? 0 : m_median_player * m_size;
 }
 
 int Team::get_id() const {
@@ -75,11 +68,22 @@ int& Team::get_id_ref(){
 }
 
 void Team::set_median() {
-    int median_index = (int)floor(this->get_size()/2);
-    m_median_player = m_players->getNodeByIndex(median_index + 1)->getData();
+    if(this->get_size() == 0)
+    {
+        m_median_player = 0;
+    }
+    else if (this->get_size() == 1)
+    {
+        m_median_player = m_players->getRoot()->getKey();
+    }
+    else
+    {
+        int median_index = (int)floor(this->get_size() / 2);
+        m_median_player = m_players->getNodeByIndex(median_index + 1)->getKey();
+    }
 }
 
-AvlTree<int, Player *>::Key_Data_pair** Team::get_team_player_array() {
+AvlTree<int, int>::Key_Data_pair** Team::get_team_player_array() {
     return this->m_players->get_tree_as_array();
 }
 
@@ -91,16 +95,16 @@ AvlTree<int, Player *>::Key_Data_pair** Team::get_team_player_array() {
 /// \param size2
 Pair_Ptr_arr Team::merge_arrays_key_data_pair(Pair_Ptr_arr arr1, int size1, Pair_Ptr_arr arr2, int size2){
     int newsize= size1 + size2;
-    Pair_Ptr_arr newArr = new AvlTree<int , Player*>::Key_Data_pair*[newsize];
+    Pair_Ptr_arr newArr = new AvlTree<int , int>::Key_Data_pair*[newsize];
     int k = 0 , l = 0;
     for (int i = 0; i < newsize ; ++i) {
         if ( k >= size1){
             newArr[i] = arr2[l++];
         }else if(l >= size2){
             newArr[i] = arr1[k++];
-        }else if (*arr1[k]->data <= *arr2[l]->data){
+        }else if (arr1[k]->key <= arr2[l]->key){
             newArr[i] = arr1[k++];
-        }else if (*arr1[k]->data > *arr2[l]->data){
+        }else if (arr1[k]->key > arr2[l]->key){
             newArr[i] = arr2[l++];
         }
     }
@@ -143,10 +147,10 @@ void Team::merge_team_into_me(Team* team2) {
     this->m_size = newSize;
     this->m_players = newtree;
     this->m_newest_player->connect_list(*team2->m_newest_player);
-    team2->m_newest_player->set_head(nullptr);
+    team2->m_newest_player->set_head(0);
 
     team2->m_players = nullptr;
-    team2->m_median_player = nullptr;
+    team2->m_median_player = 0;
     team2->set_size(0);
 
 
@@ -154,20 +158,20 @@ void Team::merge_team_into_me(Team* team2) {
 }
 
 
-AvlTree<int, Player *> *Team::create_tree_from_array(Pair_Ptr_arr arr,int size) {
-    AvlTree<int ,Player*>* newTree = new AvlTree<int ,Player*>;
+AvlTree<int, int> *Team::create_tree_from_array(Pair_Ptr_arr arr,int size) {
+    AvlTree<int ,int>* newTree = new AvlTree<int , int>;
 
     int height = (int)ceil(log2(size+1) ) -1 ;
     int redundant = (int)pow(2,height+1)-1-size;
     int i = 0;
-    newTree->insert(0 , nullptr);
+    newTree->insert(0 , 0);
     aux_create_empty_tree(newTree->getRoot() , nullptr ,redundant , height);
     aux_insert_data_to_tree(newTree->getRoot() , arr , i , height , this->m_id);
     newTree->setSize(size);
     return newTree;
 }
 
-void Team::aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Player *>* parent, int& redundant, int height) {
+void Team::aux_create_empty_tree(TreeNode<int, int>* root ,TreeNode<int, int>* parent, int& redundant, int height) {
     root->m_parent = parent;
     root->setHeight(0);
     if (height == 0){
@@ -182,7 +186,7 @@ void Team::aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Pl
             root->setSubTreeSize(2);
             redundant--;
             root->m_right = nullptr;
-            root->m_left = new TreeNode<int, Player *>(0, nullptr);
+            root->m_left = new TreeNode<int, int>(0, 0);
             aux_create_empty_tree(root->m_left, root, redundant, height - 1);
             return;
         }else{
@@ -194,25 +198,22 @@ void Team::aux_create_empty_tree(TreeNode<int, Player *>* root ,TreeNode<int, Pl
             return;
         }
     }
-    root->m_right = new TreeNode<int, Player*>(0 , nullptr);
+    root->m_right = new TreeNode<int, int>(0 , 0);
     aux_create_empty_tree(root->m_right , root , redundant ,height - 1);
 
-    root->m_left = new TreeNode<int, Player*>(0 , nullptr);
+    root->m_left = new TreeNode<int, int>(0 , 0);
     aux_create_empty_tree(root->m_left , root , redundant ,height - 1);
     root->setSubTreeSize(root->m_left->getSubTreeSize() + root->m_right->getSubTreeSize() + 1 );
     root->updateHeight();
 }
 
-void Team::aux_insert_data_to_tree(TreeNode<int, Player *> *root, Pair_Ptr_arr arr, int &i, int height , int teamId) {
+void Team::aux_insert_data_to_tree(TreeNode<int, int> *root, Pair_Ptr_arr arr, int &i, int height , int teamId) {
     if (root == nullptr ){
         return;
     }
     aux_insert_data_to_tree(root->m_left , arr , i , height - 1 , teamId);
     root->setKey( arr[i]->key);
     root->setData( arr[i]->data );
-    if (teamId != -1){
-        root->getData()->setTeamId(teamId);
-    }
     i += 1;
     aux_insert_data_to_tree(root->m_right,arr,i , height - 1 , teamId);
 }
