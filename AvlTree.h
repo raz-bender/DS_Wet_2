@@ -16,8 +16,8 @@ public:
 	~AvlTree();
 
 	Node* find(const Key& key, const Data& data = NULL);
-	Node* findMostLeft(const Key& key);
-	Node* findMostRight(const Key& key);
+	Node* findMostLeft(const Key& key , const Key& key1);
+	Node* findMostRight(const Key& key , const Key& key1);
 	//Node* findWithData(const Key& key, const Data & data);
     bool insert(const Key& key, const Data& data,int teamNumOfWins = 0, bool enableDulications = false);
 	void remove(const Key& key, const Data& data = NULL);
@@ -186,17 +186,17 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::find(const Key& key, cons
 }
 
 template<class Key, class Data>
-typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostLeft(const Key& key)
+typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostLeft(const Key& key , const Key& key1)
 {
 	Node* ans = nullptr;
 	Node* temp = m_root;
 	while (temp != nullptr) {
         if (temp->getKey() == key) {
             ans = temp;
-        } else if(ans == nullptr && temp->getKey() > key){
+        } else if(ans == nullptr && temp->getKey() > key && temp->getKey() <= key1){
             ans = temp;
         }else if(ans != nullptr && ((temp->getKey() > key && temp->getKey() < ans->getKey() ) ||
-        (temp->getKey() == ans->getKey() && temp->getData() > ans->getData()))){
+        (temp->getKey() == ans->getKey() && temp->getData() > ans->getData())) && temp->getKey() <= key1){
             ans = temp;
         }
 		temp = temp->getKey() < key ? temp->m_right : temp->m_left;
@@ -205,7 +205,7 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostLeft(const Key& k
 }
 
 template<class Key, class Data>
-typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostRight(const Key& key)
+typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostRight(const Key& key , const Key& key1)
 {
 	Node* ans = nullptr;
 	Node* temp = m_root;
@@ -213,10 +213,10 @@ typename AvlTree<Key, Data>::Node* AvlTree<Key, Data>::findMostRight(const Key& 
 	{
 		if (temp->getKey() == key){
             ans = temp;
-        } else if (ans == nullptr && temp->getKey() < key){
+        } else if (ans == nullptr && temp->getKey() < key && temp->getKey() >= key1){
             ans = temp;
         }else if( ans != nullptr && ((temp->getKey() < key && temp->getKey() > ans->getKey())
-         || (temp->getKey() == ans->getKey() && temp->getData() < ans->getData()))){
+         || (temp->getKey() == ans->getKey() && temp->getData() < ans->getData()))  && temp->getKey() >= key1){
             ans = temp;
         }
 		temp = temp->getKey() <= key ? temp->m_right : temp->m_left;

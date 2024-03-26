@@ -77,7 +77,6 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
         TreeNode<int,int>* teamNode = m_team_tree->find(team->getStrength() , team->get_id());
         team->add_player(playerStrength);
         update_team_strength_in_tree(teamNode);
-        // TODO update get_highest_ranked_team
 
     }catch(bad_alloc& e){
         return StatusType::ALLOCATION_ERROR;
@@ -126,10 +125,19 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
     auto team2Node = m_team_tree->find(team2->getStrength(), teamId2);
 
     bool is_team1_won = team1->play_match(team2);
+
     auto winningTeam = is_team1_won ? team1 : team2;
+
     auto winningTeamNode = is_team1_won ? team1Node : team2Node;
+
+//    if(winningTeam->get_number_of_wins() != winningTeamNode->getTeamNumOfWins() + 1){
+//        cout << "how";
+//    }
+
     winningTeam->set_points(winningTeamNode->getTeamNumOfWins() + 1);
+
     winningTeamNode->setTeamNumOfWins(winningTeam->get_number_of_wins());
+
     m_team_tree->updateMaxRankRecursively(winningTeamNode);
 
     return is_team1_won ? teamId1 : teamId2;
@@ -148,7 +156,7 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
     if (teamNode == nullptr){
         return 0; // is in hash table but not in tree
     }
-    return m_team_tree->getNodeCalculatedNumOfWins(teamNode) + team->get_number_of_wins();
+    return m_team_tree->getNodeCalculatedNumOfWins(teamNode) + teamNode->getTeamNumOfWins();
 }
 
 output_t<int> olympics_t::get_highest_ranked_team()
@@ -194,8 +202,8 @@ output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
     if (lowPower <= 0 || highPower <= 0 || lowPower >= highPower){
         return StatusType::INVALID_INPUT;
     }
-    TreeNode<int ,int>* lowNode= m_team_tree->findMostLeft(lowPower);
-    TreeNode<int ,int>* highNode = m_team_tree->findMostRight(highPower);
+    TreeNode<int ,int>* lowNode= m_team_tree->findMostLeft(lowPower , highPower );
+    TreeNode<int ,int>* highNode = m_team_tree->findMostRight(highPower , lowPower);
     if(lowNode == nullptr || highNode == nullptr){
         return StatusType::FAILURE;//check when is nullptr
     }
@@ -205,7 +213,7 @@ output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
     int indexMid = 0;
     int amountOfTeams = indexRight - indexLeft + 1; // 7-0 + 1 = 8
 
-    if (amountOfTeams == 0){
+    if (amountOfTeams <= 0){
         return StatusType::FAILURE;
     }else if(amountOfTeams == 1){
         return highNode->getData();
